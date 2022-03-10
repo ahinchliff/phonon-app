@@ -1,4 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IonAvatar, IonItem, IonLabel, IonSpinner } from "@ionic/react";
 import React from "react";
 import { NETWORKS } from "../constants/networks";
@@ -13,13 +12,7 @@ const PhononListItem: React.FC<{ phonon: PhononDTO }> = ({ phonon }) => {
 
   return (
     <IonItem>
-      <IonAvatar slot="start">
-        <FontAwesomeIcon
-          icon={network.icon}
-          size="2x"
-          className={network.textColor}
-        />
-      </IonAvatar>
+      <IonAvatar slot="start">{network.icon}</IonAvatar>
       <IonLabel>
         <h2>
           {isGreaterThan(phonon.Denomination, 0) ? (

@@ -1,4 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   IonAvatar,
   IonItem,
@@ -24,13 +23,7 @@ const NetworkListItem: React.FC<NetworkValue & { isLoading: boolean }> = ({
 
   return (
     <IonItem routerLink={`/${sessionId}/${networkId}/`}>
-      <IonAvatar slot="start">
-        <FontAwesomeIcon
-          icon={network.icon}
-          size="2x"
-          className={network.textColor}
-        />
-      </IonAvatar>
+      <IonAvatar slot="start">{network.icon}</IonAvatar>
       <IonLabel>
         <IonText color="light">
           <h1 className="text-xl">

@@ -31,4 +31,18 @@ export const NETWORKS: Network[] = [
     textColor: "text-indigo-300",
     symbol: "Ξ",
   },
+  {
+    icon: faEthereum,
+    ticker: "PHONON",
+    name: "Native Phonon",
+    textColor: "text-indigo-300",
+    symbol: "PH",
+  },
+  {
+    icon: faEthereum,
+    ticker: "BNB",
+    name: "Binance",
+    textColor: "text-indigo-300",
+    symbol: "$",
+  },
 ];

@@ -1,7 +1,7 @@
 import { faBtc, faEthereum } from "@fortawesome/free-brands-svg-icons";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 
-type Network = {
+export type Network = {
   icon: typeof faBtc;
   ticker: string;
   name: string;
@@ -30,5 +30,12 @@ export const NETWORKS: Network[] = [
     name: "Ethereum",
     textColor: "text-indigo-300",
     symbol: "Ξ",
+  },
+  {
+    icon: faEthereum,
+    ticker: "ETH NFT",
+    name: "Ethereum NFT",
+    textColor: "text-indigo-300",
+    symbol: "ETH NFT",
   },
 ];

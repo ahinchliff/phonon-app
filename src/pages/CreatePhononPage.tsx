@@ -14,13 +14,24 @@ import {
   CreatePhononFormSuggested,
   CreatePhononFormSuggestedValues,
 } from "../components/CreatePhononFormSuggested";
+import { CreateNFTPhononForm } from "../components/CreatePhononFormNFT";
 import useNetwork from "../hooks/useNetwork";
 import {
   useFinalizeDepositMutation,
   useInitDepositMutation,
 } from "../store/api";
+import { NetworkId, NewPhonon, Tag } from "../types";
 import { ethToBn, ethToWei, weiToEth } from "../utils/denomination";
 import { makeChange } from "../utils/math";
+
+type FormType = "native" | "nft";
+
+const NetworkToFormMap: { [key in NetworkId]: FormType } = {
+  0: "native",
+  1: "native",
+  2: "native",
+  3: "nft",
+};
 
 const CreatePhononPage: React.FC = () => {
   const { sessionId, networkId } = useParams<{
@@ -28,37 +39,17 @@ const CreatePhononPage: React.FC = () => {
     networkId: string;
   }>();
   const router = useIonRouter();
-  const [isCustomizing, setIsCustomizing] = useState(false);
   const [isPending, setIsPending] = useState(false);
-  const [isMassCreating, setIsMassCreating] = useState(false);
   const [initDeposit] = useInitDepositMutation();
   const [finalizeDeposit] = useFinalizeDepositMutation();
-  const { network } = useNetwork();
+  const CurrencyType = parseInt(networkId);
 
-  const onSubmitSuggested = (data: CreatePhononFormSuggestedValues) =>
-    onSubmit(makeChange(parseFloat(data.amount)));
-
-  const onSubmitCustomized = (data: CreatePhononFormCustomValues) =>
-    onSubmit(data.phononsToCreate);
-
-  const onSubmitSingle = (data: CreatePhononFormSingleValues) =>
-    onSubmit([{ amount: 1, denomination: data.amount }]);
-
-  const onSubmit = async (
-    data: {
-      amount: number;
-      denomination: string;
-    }[]
-  ) => {
+  const onSubmit = async (newPhonons: NewPhonon[]) => {
     setIsPending(true);
-    const Denominations = data.flatMap((d) => {
-      const denomination = ethToWei(d.denomination);
-      const arr = Array(d.amount);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      return arr.fill(Number(denomination));
-    });
-    const CurrencyType = parseInt(networkId);
-    const payload = { CurrencyType, Denominations };
+    const payload = {
+      CurrencyType,
+      Denominations: newPhonons.map((np) => np.denomination),
+    };
     await initDeposit({ payload, sessionId })
       .unwrap()
       .then(async (payload) => {
@@ -104,13 +95,61 @@ const CreatePhononPage: React.FC = () => {
       });
   };
 
+  if (NetworkToFormMap[CurrencyType] === "native") {
+    return <CreateNativePhonons isPending={isPending} onSubmit={onSubmit} />;
+  }
+
+  return <CreateNFTPhononForm isPending={isPending} onSubmit={onSubmit} />;
+};
+
+export default CreatePhononPage;
+
+type CreateNativePhononsProps = {
+  isPending: boolean;
+  onSubmit: (newPhonons: NewPhonon[]) => Promise<void>;
+};
+
+const CreateNativePhonons: React.FC<CreateNativePhononsProps> = ({
+  isPending,
+  onSubmit,
+}) => {
+  const [isCustomizing, setIsCustomizing] = useState(false);
+  const [isMassCreating, setIsMassCreating] = useState(false);
+  const { network } = useNetwork();
+
+  const onSubmitSuggested = (data: CreatePhononFormSuggestedValues) => {
+    const change = makeChange(parseFloat(data.amount));
+    const newPhonons: NewPhonon[] = change.flatMap((d) => {
+      const arr = Array(d.amount);
+      const denomination = Number(ethToWei(d.denomination));
+      const newPhonon: NewPhonon = { denomination };
+      return arr.fill(newPhonon) as NewPhonon[];
+    });
+
+    return onSubmit(newPhonons);
+  };
+
+  const onSubmitCustomized = (data: CreatePhononFormCustomValues) => {
+    const newPhonons: NewPhonon[] = data.phononsToCreate.flatMap((d) => {
+      const arr = Array(d.amount);
+      const denomination = Number(ethToWei(d.denomination));
+      const newPhonon: NewPhonon = { denomination };
+      return arr.fill(newPhonon) as NewPhonon[];
+    });
+
+    return onSubmit(newPhonons);
+  };
+
+  const onSubmitSingle = (data: CreatePhononFormSingleValues) => {
+    return onSubmit([{ denomination: Number(data.amount) }]);
+  };
+
   const handleCustomize = () => {
     setIsCustomizing(true);
   };
 
   const handleSuggest = () => {
     setIsCustomizing(false);
-    // setInputValue(rollupChange(denominationAmounts));
   };
 
   const renderMassCreate = () => (
@@ -160,5 +199,3 @@ const CreatePhononPage: React.FC = () => {
     </div>
   );
 };
-
-export default CreatePhononPage;

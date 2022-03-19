@@ -2,6 +2,8 @@ export type Session = string;
 export type Eth = string | number;
 export type Wei = string | number;
 
+export type NetworkId = 0 | 1 | 2 | 3;
+
 export type CreatePhononResponse = {
   index: number;
   pubKey: string;
@@ -61,4 +63,11 @@ export type PhononDTO = {
 export type RedeemPhononDTO = {
   P: PhononDTO;
   RedeemAddress: string;
+};
+
+export type Tag = { name: string; value: string };
+
+export type NewPhonon = {
+  denomination: number;
+  tags?: Tag[];
 };

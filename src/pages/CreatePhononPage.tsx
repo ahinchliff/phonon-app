@@ -55,7 +55,7 @@ const CreatePhononPage: React.FC = () => {
       const denomination = ethToWei(d.denomination);
       const arr = Array(d.amount);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      return arr.fill(denomination);
+      return arr.fill(Number(denomination));
     });
     const CurrencyType = parseInt(networkId);
     const payload = { CurrencyType, Denominations };

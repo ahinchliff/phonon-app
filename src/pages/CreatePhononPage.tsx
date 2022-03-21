@@ -20,7 +20,7 @@ import {
   useFinalizeDepositMutation,
   useInitDepositMutation,
 } from "../store/api";
-import { NetworkId, NewPhonon, Tag } from "../types";
+import { NetworkId, NewPhonon } from "../types";
 import { ethToBn, ethToWei, weiToEth } from "../utils/denomination";
 import { makeChange } from "../utils/math";
 
@@ -44,17 +44,20 @@ const CreatePhononPage: React.FC = () => {
   const [finalizeDeposit] = useFinalizeDepositMutation();
   const CurrencyType = parseInt(networkId);
 
+  const isNFT = NetworkToFormMap[CurrencyType] === "nft";
+
   const onSubmit = async (newPhonons: NewPhonon[]) => {
     setIsPending(true);
     const payload = {
       CurrencyType,
       Denominations: newPhonons.map((np) => np.denomination),
+      Tags: newPhonons.map((np) => np.tags || []),
     };
     await initDeposit({ payload, sessionId })
       .unwrap()
       .then(async (payload) => {
         // @ts-expect-error - window
-        if (window.ethereum) {
+        if (window.ethereum && !isNFT) {
           // @ts-expect-error - window
           const provider = new ethers.providers.Web3Provider(window.ethereum);
           await provider.send("eth_requestAccounts", []);
@@ -95,11 +98,11 @@ const CreatePhononPage: React.FC = () => {
       });
   };
 
-  if (NetworkToFormMap[CurrencyType] === "native") {
-    return <CreateNativePhonons isPending={isPending} onSubmit={onSubmit} />;
+  if (isNFT) {
+    return <CreateNFTPhononForm isPending={isPending} onSubmit={onSubmit} />;
   }
 
-  return <CreateNFTPhononForm isPending={isPending} onSubmit={onSubmit} />;
+  return <CreateNativePhonons isPending={isPending} onSubmit={onSubmit} />;
 };
 
 export default CreatePhononPage;

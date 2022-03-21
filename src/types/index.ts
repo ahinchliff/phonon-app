@@ -38,9 +38,12 @@ export type DescriptorDTO = {
   sessionId: string;
 };
 
+export type Tag = { TagName: string; TagValue: string };
+
 export type DepositRequest = {
   CurrencyType: number;
   Denominations: Wei[];
+  Tags?: Tag[][];
 };
 
 export type DepositConfirmation = {
@@ -64,8 +67,6 @@ export type RedeemPhononDTO = {
   P: PhononDTO;
   RedeemAddress: string;
 };
-
-export type Tag = { name: string; value: string };
 
 export type NewPhonon = {
   denomination: number;

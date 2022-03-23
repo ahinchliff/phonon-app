@@ -54,12 +54,13 @@ const CreatePhononPage: React.FC = () => {
       Denominations: newPhonons.map((np) => np.denomination),
       Tags: newPhonons.map((np) => np.tags || []),
     };
-    console.log(["payload", payload]);
+    // Consider doing basic error checking BEFORE creating the phonon,
+    // i.e. verifying person has the NFT or sufficient ETH to fill phonon.
+    // it can lead to the phonon being created, and then not destroyed 
     await initDeposit({ payload, sessionId })
       .unwrap()
       .then(async (payload) => {
         // @ts-expect-error - window
-        //if (window.ethereum && !isNFT) {
         if (window.ethereum) {
           // @ts-expect-error - window
           const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -70,6 +71,7 @@ const CreatePhononPage: React.FC = () => {
           await Promise.all(
             payload.map(async (phonon) => {
               const txObject = { to: phonon.Address };
+
               if (isNFT) {
                 const abi = [
                   {
@@ -139,30 +141,29 @@ const CreatePhononPage: React.FC = () => {
                   .catch(console.error)
                   .finally(() => setIsPending(false));
               } else {
-                txObject["value"] = ethToBn(weiToEth(phonon.Denomination));
+                const to = phonon.Address;
+                const value = ethToBn(weiToEth(phonon.Denomination));
+                return signer
+                  .sendTransaction({ to, value })
+                  .then((response) => {
+                    if (response) {
+                      const Phonon = { ...phonon, ChainID };
+                      const payload = [
+                        {
+                          Phonon,
+                          ConfirmedOnChain: true,
+                          ConfirmedOnCard: true,
+                        },
+                      ];
+                      finalizeDeposit({ payload, sessionId }).catch(
+                        console.error
+                      );
+                      router.push(`/${sessionId}/${networkId}/`);
+                    }
+                  })
+                  .catch(console.error)
+                  .finally(() => setIsPending(false));
               }
-              return;
-              /*signer
-              .sendTransaction(txObject)
-              .then((response) => {
-                if (response) {
-                  const Phonon = { ...phonon, ChainID };
-                  const payload = [
-                    {
-                      Phonon,
-                      ConfirmedOnChain: true,
-                      ConfirmedOnCard: true,
-                    },
-                  ];
-                  finalizeDeposit({ payload, sessionId }).catch(
-                    console.error
-                  );
-                  router.push(`/${sessionId}/${networkId}/`);
-                }
-              })
-              .catch(console.error)
-              .finally(() => setIsPending(false));
-              */
             })
           );
         } else {

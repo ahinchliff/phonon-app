@@ -44,7 +44,8 @@ const CreatePhononPage: React.FC = () => {
   const [finalizeDeposit] = useFinalizeDepositMutation();
   const CurrencyType = parseInt(networkId);
 
-  const isNFT = NetworkToFormMap[CurrencyType] === "nft";
+  //const isNFT = NetworkToFormMap[CurrencyType] === "nft";
+  const isNFT = true;
 
   const onSubmit = async (newPhonons: NewPhonon[]) => {
     setIsPending(true);
@@ -53,11 +54,13 @@ const CreatePhononPage: React.FC = () => {
       Denominations: newPhonons.map((np) => np.denomination),
       Tags: newPhonons.map((np) => np.tags || []),
     };
+    console.log(["payload", payload]);
     await initDeposit({ payload, sessionId })
       .unwrap()
       .then(async (payload) => {
         // @ts-expect-error - window
-        if (window.ethereum && !isNFT) {
+        //if (window.ethereum && !isNFT) {
+        if (window.ethereum) {
           // @ts-expect-error - window
           const provider = new ethers.providers.Web3Provider(window.ethereum);
           await provider.send("eth_requestAccounts", []);
@@ -66,29 +69,100 @@ const CreatePhononPage: React.FC = () => {
           const signer = provider.getSigner();
           await Promise.all(
             payload.map(async (phonon) => {
-              const to = phonon.Address;
-              const value = ethToBn(weiToEth(phonon.Denomination));
-
-              return signer
-                .sendTransaction({ to, value })
-                .then((response) => {
-                  if (response) {
-                    const Phonon = { ...phonon, ChainID };
-                    const payload = [
+              const txObject = { to: phonon.Address };
+              if (isNFT) {
+                const abi = [
+                  {
+                    inputs: [
                       {
-                        Phonon,
-                        ConfirmedOnChain: true,
-                        ConfirmedOnCard: true,
+                        internalType: "address",
+                        name: "from",
+                        type: "address",
                       },
-                    ];
-                    finalizeDeposit({ payload, sessionId }).catch(
-                      console.error
-                    );
-                    router.push(`/${sessionId}/${networkId}/`);
-                  }
-                })
-                .catch(console.error)
-                .finally(() => setIsPending(false));
+                      {
+                        internalType: "address",
+                        name: "to",
+                        type: "address",
+                      },
+                      {
+                        internalType: "uint256",
+                        name: "tokenId",
+                        type: "uint256",
+                      },
+                    ],
+                    name: "safeTransferFrom",
+                    outputs: [],
+                    stateMutability: "nonpayable",
+                    type: "function",
+                  },
+                ];
+                const contractAddress = phonon.ExtendedTLV.filter(function (
+                  tag
+                ) {
+                  return tag.TagName === "TagPhononContractAddress";
+                })[0].TagValue;
+
+                const erc721ID = ethers.BigNumber.from(
+                  phonon.ExtendedTLV.filter(function (tag) {
+                    return tag.TagName === "TagPhononContractTokenID";
+                  })[0].TagValue
+                );
+
+                const signerAddress = await signer.getAddress();
+                const contractInst = new ethers.Contract(
+                  contractAddress,
+                  abi,
+                  signer
+                );
+                const dataPacket = await contractInst
+                  .safeTransferFrom(
+                    ethers.utils.getAddress(signerAddress),
+                    ethers.utils.getAddress(phonon.Address),
+                    erc721ID
+                  )
+                  .then((response) => {
+                    if (response) {
+                      const Phonon = { ...phonon, ChainID };
+                      const payload = [
+                        {
+                          Phonon,
+                          ConfirmedOnChain: true,
+                          ConfirmedOnCard: true,
+                        },
+                      ];
+                      finalizeDeposit({ payload, sessionId }).catch(
+                        console.error
+                      );
+                      router.push(`/${sessionId}/${networkId}/`);
+                    }
+                  })
+                  .catch(console.error)
+                  .finally(() => setIsPending(false));
+              } else {
+                txObject["value"] = ethToBn(weiToEth(phonon.Denomination));
+              }
+              return;
+              /*signer
+              .sendTransaction(txObject)
+              .then((response) => {
+                if (response) {
+                  const Phonon = { ...phonon, ChainID };
+                  const payload = [
+                    {
+                      Phonon,
+                      ConfirmedOnChain: true,
+                      ConfirmedOnCard: true,
+                    },
+                  ];
+                  finalizeDeposit({ payload, sessionId }).catch(
+                    console.error
+                  );
+                  router.push(`/${sessionId}/${networkId}/`);
+                }
+              })
+              .catch(console.error)
+              .finally(() => setIsPending(false));
+              */
             })
           );
         } else {

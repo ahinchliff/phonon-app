@@ -28,7 +28,7 @@ export const CreateNFTPhononForm: React.FC<{
             TagName: "TagPhononContractAddress",
             TagValue: data.contractAddress,
           },
-          { TagName: "TagPhononContractTokenId", TagValue: data.tokenId },
+          { TagName: "TagPhononContractTokenID", TagValue: data.tokenId },
         ],
       },
     ]);

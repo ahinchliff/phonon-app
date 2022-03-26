@@ -2,16 +2,18 @@ import { IonButton, IonIcon, useIonRouter } from "@ionic/react";
 import { logOutOutline } from "ionicons/icons";
 import React from "react";
 import { useParams } from "react-router";
+import { getRedeemPath } from "../utils/navigation";
 
 export default function RedeemPhononButton() {
-  const { sessionId, networkId } = useParams<{
+  const { sessionId, networkId, assetId } = useParams<{
     sessionId: string;
     networkId: string;
+    assetId: string;
   }>();
   const router = useIonRouter();
 
   const goToRedeemPage = () => {
-    router.push(`/${sessionId}/${networkId}/redeem`);
+    router.push(getRedeemPath(sessionId, networkId, assetId));
   };
 
   return (

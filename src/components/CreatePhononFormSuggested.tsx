@@ -13,7 +13,7 @@ export const CreatePhononFormSuggested: React.FC<{
   onSubmit: any;
   isPending: boolean;
 }> = ({ handleCustomize, onSubmit, isPending }) => {
-  const { network } = useNetwork();
+  const network = useNetwork();
 
   const { register, handleSubmit, control } =
     useForm<CreatePhononFormSuggestedValues>();

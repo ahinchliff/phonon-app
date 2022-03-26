@@ -2,7 +2,23 @@ export type Session = string;
 export type Eth = string | number;
 export type Wei = string | number;
 
-export type NetworkId = 0 | 1 | 2 | 3;
+export enum NetworkId {
+  Unspecified,
+  // Phonon,
+  Bitcoin,
+  Ethereum,
+  EthereumRinkeby,
+}
+
+export type NetworkIdMap<T> = { [key in NetworkId]: T };
+
+export enum AssetTypeId {
+  Native,
+  ERC20,
+  ERC721,
+}
+
+export type AssetTypeIdMap<T> = { [key in AssetTypeId]: T };
 
 export type CreatePhononResponse = {
   index: number;
@@ -17,7 +33,7 @@ export type Phonon = {
 };
 
 export type NetworkValue = {
-  networkId: number;
+  networkId: NetworkId;
   value: number | undefined;
 };
 
@@ -25,15 +41,9 @@ export type PhononPair = {
   url: string;
 };
 
-export enum CurrencyType {
-  BTC,
-  ETH,
-  OTHER,
-}
-
 export type DescriptorDTO = {
   index: number;
-  currencyType: number;
+  assetType: AssetTypeId;
   value: number;
   sessionId: string;
 };
@@ -41,7 +51,7 @@ export type DescriptorDTO = {
 export type Tag = { TagName: string; TagValue: string };
 
 export type DepositRequest = {
-  CurrencyType: number;
+  CurrencyType: number; // todo - make stricter
   Denominations: Wei[];
   Tags?: Tag[][];
 };
@@ -60,7 +70,8 @@ export type PhononDTO = {
   SchemaVersion: number;
   ExtendedSchemaVersion: number;
   Denomination: string;
-  CurrencyType: number;
+  CurrencyType: NetworkId; // suggestion - name this property NetworkId
+  ChainID: AssetTypeId; // suggestion - name this property AssetTypeId
   ExtendedTLV: Tag[];
 };
 
@@ -70,6 +81,6 @@ export type RedeemPhononDTO = {
 };
 
 export type NewPhonon = {
-  denomination: number;
+  denomination: string;
   tags?: Tag[];
 };

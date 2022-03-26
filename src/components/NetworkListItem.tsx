@@ -6,24 +6,36 @@ import {
   IonSpinner,
   IonText,
 } from "@ionic/react";
+import { ethers } from "ethers";
 import React from "react";
 import { useParams } from "react-router";
+import { ASSETS } from "../constants/assets";
 import { NETWORKS } from "../constants/networks";
 import "../index.css";
-import { NetworkValue } from "../types";
+import { NetworkId, AssetTypeId as AssetTypeId } from "../types";
 import { weiToEth } from "../utils/denomination";
+import { getPhononListPath } from "../utils/navigation";
 
-const NetworkListItem: React.FC<NetworkValue & { isLoading: boolean }> = ({
+export type Props = {
+  networkId: NetworkId;
+  assetId: AssetTypeId;
+  value: ethers.BigNumber;
+  isLoading: boolean;
+};
+
+const NetworkListItem: React.FC<Props> = ({
   networkId,
+  assetId,
   value,
   isLoading,
 }) => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const network = NETWORKS[networkId];
+  const asset = ASSETS[assetId];
   const label = weiToEth(value?.toString() ?? "0");
 
   return (
-    <IonItem routerLink={`/${sessionId}/${networkId}/`}>
+    <IonItem routerLink={getPhononListPath(sessionId, networkId, assetId)}>
       <IonAvatar slot="start">
         <FontAwesomeIcon
           icon={network.icon}
@@ -34,7 +46,7 @@ const NetworkListItem: React.FC<NetworkValue & { isLoading: boolean }> = ({
       <IonLabel>
         <IonText color="light">
           <h1 className="text-xl">
-            {isLoading ? <IonSpinner /> : label} {network.ticker}
+            {isLoading ? <IonSpinner /> : label} {network.ticker} {asset.name}
           </h1>
         </IonText>
       </IonLabel>

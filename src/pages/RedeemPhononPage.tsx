@@ -26,7 +26,7 @@ const RedeemPhononPage: React.FC = () => {
   const [isPending, setIsPending] = useState(false);
   const [RedeemAddress, setRedeemAddress] = useState("");
   const [redeemPhonon] = useRedeemPhononMutation();
-  const { network } = useNetwork();
+  const network = useNetwork();
   const { phonons } = usePhonons();
 
   const getAddress = async () => {

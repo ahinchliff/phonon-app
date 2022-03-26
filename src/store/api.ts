@@ -50,7 +50,7 @@ export const api = createApi({
       }
     ),
     setDescriptor: builder.mutation<void, DescriptorDTO>({
-      query: ({ index, currencyType, sessionId, value }) => ({
+      query: ({ index, assetType: currencyType, sessionId, value }) => ({
         url: `cards/${sessionId}/phonon/${index}/setDescriptor`,
         method: "POST",
         body: { currencyType, value },

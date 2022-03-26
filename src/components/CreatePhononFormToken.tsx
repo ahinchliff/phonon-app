@@ -2,14 +2,13 @@ import { IonButton } from "@ionic/react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { NewPhonon } from "../types";
-// import * as yup from "yup";
 
-export type CreatePhononFormNFTValues = {
+export type CreatePhononFormTokenValues = {
   contractAddress: string;
-  tokenId: string;
+  amount: string;
 };
 
-export const CreateNFTPhononForm: React.FC<{
+export const CreateTokenPhononForm: React.FC<{
   onSubmit: (newPhonon: NewPhonon[]) => Promise<void>;
   isPending: boolean;
 }> = ({ onSubmit, isPending }) => {
@@ -17,18 +16,17 @@ export const CreateNFTPhononForm: React.FC<{
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CreatePhononFormNFTValues>();
+  } = useForm<CreatePhononFormTokenValues>();
 
-  const onSubmitInternal = (data: CreatePhononFormNFTValues) => {
+  const onSubmitInternal = (data: CreatePhononFormTokenValues) => {
     return onSubmit([
       {
-        denomination: "1",
+        denomination: data.amount,
         tags: [
           {
             TagName: "TagPhononContractAddress",
             TagValue: data.contractAddress,
           },
-          { TagName: "TagPhononContractTokenID", TagValue: data.tokenId },
         ],
       },
     ]);
@@ -37,7 +35,7 @@ export const CreateNFTPhononForm: React.FC<{
   return (
     <>
       <p className="text-xl font-bold text-center text-gray-300 uppercase">
-        CREATE NFT PHONON
+        CREATE TOKEN PHONON
       </p>
       <form
         className="flex flex-col content-center justify-start h-full gap-2 p-2"
@@ -59,15 +57,15 @@ export const CreateNFTPhononForm: React.FC<{
 
         <input
           className="text-bold p-2 text-xl bg-zinc-800 shadow-inner"
-          placeholder="Token ID"
+          placeholder="Amount"
           disabled={isPending}
-          {...register("tokenId", {
+          {...register("amount", {
             required: true,
           })}
         />
-        {errors?.tokenId?.type === "required" && (
+        {errors?.amount?.type === "required" && (
           <p className="text-bold p-2 text-xl text-zinc-200 shadow-inner">
-            Token ID is required.
+            Amount is required.
           </p>
         )}
 

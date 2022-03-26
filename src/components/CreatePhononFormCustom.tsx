@@ -6,6 +6,7 @@ import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { denominations } from "../constants/denominations";
 import useNetwork from "../hooks/useNetwork";
 import { rollupChange } from "../utils/math";
+import { isValidPhononDenomination } from "../utils/validation";
 
 export type CreatePhononFormCustomValues = {
   phononsToCreate: {
@@ -39,7 +40,7 @@ export const CreatePhononFormCustom: React.FC<{
     control,
   });
   const total = rollupChange(formValues);
-  const { network } = useNetwork();
+  const network = useNetwork();
 
   const handleAddDenomination = (formValues) => {
     const unusedDenominations = denominations.filter(
@@ -66,6 +67,7 @@ export const CreatePhononFormCustom: React.FC<{
                 placeholder="Amount"
                 {...register(`phononsToCreate.${index}.amount` as const, {
                   required: true,
+                  validate: isValidPhononDenomination,
                 })}
                 className={clsx(
                   "text-bold p-2 text-xl bg-zinc-800 shadow-inner w-1/3",

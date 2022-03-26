@@ -27,7 +27,7 @@ export const RedeemPhononFormCustom: React.FC<{
     name: "phononsToRedeem",
     control,
   });
-  const { network } = useNetwork();
+  const network = useNetwork();
   const { phonons } = usePhonons();
 
   const getTotal = () => {

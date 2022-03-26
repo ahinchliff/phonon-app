@@ -7,24 +7,24 @@ import {
   IonSpinner,
 } from "@ionic/react";
 import React from "react";
-import { useParams } from "react-router-dom";
 import CreatePhononButton from "../components/CreatePhononButton";
 import PhononListItem from "../components/PhononListItem";
 import RedeemPhononButton from "../components/RedeemPhononButton";
-import { NETWORKS } from "../constants/networks";
+import SendPhononButton from "../components/SendPhononButton";
+import useNetwork from "../hooks/useNetwork";
+import useSessionId from "../hooks/useSession";
 import { useFetchPhononsQuery } from "../store/api";
 import { weiToEth } from "../utils/denomination";
-import { reduceDenominations } from "../utils/math";
+import { reduceDenominations, sortPhonon } from "../utils/math";
 
 const PhononsList: React.FC = () => {
-  const { sessionId, networkId } = useParams<{
-    sessionId: string;
-    networkId: string;
-  }>();
+  const sessionId = useSessionId();
+  const network = useNetwork();
+
+  // todo - filter by asset type here (currently ChainId)
   const { data, refetch, isLoading, isFetching } = useFetchPhononsQuery({
     sessionId,
   });
-  const network = NETWORKS[parseInt(networkId)];
 
   function refresh(event: CustomEvent<any>) {
     refetch();
@@ -33,22 +33,25 @@ const PhononsList: React.FC = () => {
 
   const total =
     data
-      ?.filter((p) => p.CurrencyType === parseInt(networkId))
+      ?.filter((p) => p.CurrencyType === network.id)
       .map((p) => p.Denomination)
       .reduce(reduceDenominations, "0") ?? "0";
 
   return (
     <IonContent>
       <div className="mt-2 text-center">
-        <p className="text-xs font-extrabold text-zinc-500">WALLET</p>
-        <p className="mb-3">
+        <p className="text-md font-extrabold text-zinc-500">WALLET</p>
+        <p className="text-xl mb-5">
           {weiToEth(total)} {network?.symbol}
         </p>
       </div>
 
       <div className="flex mb-5 justify-evenly">
-        <IonButtons slot="secondary">
+        <IonButtons slot="primary">
           <CreatePhononButton />
+        </IonButtons>
+        <IonButtons slot="secondary">
+          <SendPhononButton />
         </IonButtons>
         <IonButtons slot="end">
           <RedeemPhononButton />
@@ -70,7 +73,8 @@ const PhononsList: React.FC = () => {
           </IonRefresher>
           <IonList>
             {data
-              ?.filter((item) => item.CurrencyType === parseInt(networkId))
+              ?.filter((item) => item.CurrencyType === network.id)
+              .sort(sortPhonon)
               .map((item) => (
                 <PhononListItem phonon={item} key={item.PubKey} />
               ))}

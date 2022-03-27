@@ -84,3 +84,16 @@ export type NewPhonon = {
   denomination: string;
   tags?: Tag[];
 };
+
+type AssetDetailsBase = {
+  networkId: NetworkId;
+  assetTypeId: AssetTypeId;
+  contractAddress: string;
+  symbol: string;
+};
+
+export type ERC20Details = AssetDetailsBase & {
+  decimals: number;
+};
+export type ERC721Details = AssetDetailsBase;
+export type AssetDetails = ERC20Details | ERC721Details;

@@ -4,8 +4,9 @@ import React, { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import useNetwork from "../hooks/useNetwork";
 import { NewPhonon } from "../types";
-import { fetchTokenDetails, TokenDetails } from "../utils/phonon/asset-data";
-import { getProvider } from "../utils/providers";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAssetDetails } from "../store/assetsSlice";
+import { RootState } from "../store";
 
 export type CreatePhononFormTokenValues = {
   contractAddress: string;
@@ -17,6 +18,7 @@ export const CreateTokenPhononForm: React.FC<{
   isPending: boolean;
 }> = ({ onSubmit, isPending }) => {
   const network = useNetwork();
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -24,8 +26,6 @@ export const CreateTokenPhononForm: React.FC<{
     control,
     formState: { errors },
   } = useForm<CreatePhononFormTokenValues>();
-
-  const [tokenDetails, setTokenDetails] = React.useState<TokenDetails>();
 
   const contractAddress = useWatch({
     name: "contractAddress",
@@ -36,16 +36,9 @@ export const CreateTokenPhononForm: React.FC<{
     if (!ethers.utils.isAddress(contractAddress)) {
       return;
     }
-    const provider = getProvider(network.id);
 
-    if (!provider) {
-      return;
-    }
-
-    fetchTokenDetails(contractAddress, provider)
-      .then(setTokenDetails)
-      .catch(console.error);
-  }, [contractAddress]);
+    dispatch(fetchAssetDetails({ networkId: network.id, contractAddress }));
+  }, [contractAddress, network, dispatch]);
 
   const onSubmitInternal = (data: CreatePhononFormTokenValues) => {
     return onSubmit([
@@ -61,10 +54,18 @@ export const CreateTokenPhononForm: React.FC<{
     ]);
   };
 
+  const assetDetails = useSelector(
+    (state: RootState) => state.assets.assetDetails
+  );
+
+  const assetDetail = assetDetails.find(
+    (asset) => asset.contractAddress === contractAddress
+  );
+
   return (
     <>
       <p className="text-xl font-bold text-center text-gray-300 uppercase">
-        CREATE {tokenDetails?.symbol || "TOKEN"} PHONON
+        CREATE {assetDetail?.symbol || "TOKEN"} PHONON
       </p>
 
       <form

@@ -6,11 +6,15 @@ import { getProvider } from "../utils/providers";
 
 type State = {
   assetDetails: AssetDetails[];
+  fetchingAssetDetails: boolean;
+  fetchAssetDetailsError: string | undefined;
 };
 
-const initialState = {
+const initialState: State = {
   assetDetails: assetDetailsLocalStorage.get() || [],
-} as State;
+  fetchingAssetDetails: false,
+  fetchAssetDetailsError: undefined,
+};
 
 export const setAssetDetails = createAsyncThunk(
   "assets/fetchAssetDetails",
@@ -19,19 +23,6 @@ export const setAssetDetails = createAsyncThunk(
     assetTypeId: AssetTypeId;
     contractAddress: string;
   }) => {
-    // const state = api.getState() as State;
-
-    // if (
-    //   state.assetDetails.find(
-    //     ({ networkId, contractAddress }) =>
-    //       networkId === data.networkId &&
-    //       contractAddress?.toLowerCase() === data.contractAddress.toLowerCase()
-    //   )
-    // ) {
-    //   console.log("No need to fetch asset details");
-    //   return;
-    // }
-
     const provider = getProvider(data.networkId);
     if (!provider) {
       return;
@@ -49,9 +40,22 @@ export const setAssetDetails = createAsyncThunk(
 const assetsSlice = createSlice({
   name: "assets",
   initialState,
-  reducers: {},
+  reducers: {
+    clearFetchAssetDetailsError: (state) => {
+      state.fetchAssetDetailsError = undefined;
+    },
+  },
   extraReducers: (builder) => {
+    builder.addCase(setAssetDetails.rejected, (state, action) => {
+      state.fetchingAssetDetails = false;
+      state.fetchAssetDetailsError = action.error.message;
+    });
+    builder.addCase(setAssetDetails.pending, (state) => {
+      state.fetchAssetDetailsError = undefined;
+      state.fetchingAssetDetails = true;
+    });
     builder.addCase(setAssetDetails.fulfilled, (state, action) => {
+      state.fetchAssetDetailsError = undefined;
       if (!action.payload) {
         return;
       }
@@ -82,5 +86,5 @@ const assetsSlice = createSlice({
   },
 });
 
-export const {} = assetsSlice.actions;
+export const { clearFetchAssetDetailsError } = assetsSlice.actions;
 export default assetsSlice.reducer;

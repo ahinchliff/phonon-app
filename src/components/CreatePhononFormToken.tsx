@@ -30,7 +30,11 @@ export const CreateTokenPhononForm: React.FC<{
     control,
   });
 
-  useSetAssetDetails(network.id, AssetTypeId.ERC20, contractAddress);
+  const { loading, error } = useSetAssetDetails(
+    network.id,
+    AssetTypeId.ERC20,
+    contractAddress
+  );
 
   const assetDetail = useAssetDetails(
     network.id,
@@ -43,6 +47,7 @@ export const CreateTokenPhononForm: React.FC<{
       console.error("No asset details");
       return;
     }
+
     return onSubmit([
       {
         denomination: data.amount,
@@ -95,6 +100,9 @@ export const CreateTokenPhononForm: React.FC<{
           </p>
         )}
 
+        {loading && <p>Fetching token details...</p>}
+        {!!error && <p>Failed fetching token details - {error}</p>}
+
         <div className="pinned">
           <IonButton
             key="submit"
@@ -104,7 +112,7 @@ export const CreateTokenPhononForm: React.FC<{
             expand="full"
             color="primary"
             className="shadow-lg shadow-teal-300/40"
-            disabled={isPending}
+            disabled={isPending || !assetDetail}
           >
             Create
           </IonButton>

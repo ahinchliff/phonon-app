@@ -1,11 +1,11 @@
 import { AssetTypeId, NetworkId, AssetDetails } from "../types";
 import { ethers } from "ethers";
-// todo move the contracts out of the phonon directory
+// todo - move the contracts out of the phonon directory
 import { ERC20__factory } from "./phonon/contracts";
 
 export const fetchAssetDetails = async (
   networkId: NetworkId,
-  assetType: AssetTypeId,
+  assetTypeId: AssetTypeId,
   contractAddress: string,
   providerOrSigner: ethers.providers.Provider | ethers.Signer
 ): Promise<AssetDetails> => {
@@ -13,12 +13,12 @@ export const fetchAssetDetails = async (
 
   const [symbol, decimals] = await Promise.all([
     erc20.symbol(),
-    assetType === AssetTypeId.ERC20 ? erc20.decimals() : 0,
+    assetTypeId === AssetTypeId.ERC20 ? erc20.decimals() : 0,
   ]);
 
   return {
     networkId,
-    assetTypeId: AssetTypeId.ERC20,
+    assetTypeId,
     contractAddress,
     symbol,
     decimals,

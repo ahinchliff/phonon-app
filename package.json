@@ -61,7 +61,7 @@
     "test": "react-scripts test --transformIgnorePatterns 'node_modules/(?!(@ionic/react|@ionic/react-router|@ionic/core|@stencil/core|ionicons)/)'",
     "eject": "react-scripts eject",
     "lint": "eslint --config ./.eslintrc --ignore-path ./.eslintignore ./src/**/*",
-    "generate-contract-types": "typechain --target ethers-v5 --out-dir ./src/utils/blockchain/contracts './src/utils/blockchain/abis/**/*.json'"
+    "generate-contract-types": "typechain --target ethers-v5 --out-dir ./src/utils/phonon/contracts './src/utils/phonon/abis/**/*.json'"
   },
   "eslintConfig": {
     "extends": [

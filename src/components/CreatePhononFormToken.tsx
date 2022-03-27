@@ -4,9 +4,9 @@ import React, { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import useNetwork from "../hooks/useNetwork";
 import { NewPhonon } from "../types";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { fetchAssetDetails } from "../store/assetsSlice";
-import { RootState } from "../store";
+import useAssetDetails from "../hooks/useAssetDetails";
 
 export type CreatePhononFormTokenValues = {
   contractAddress: string;
@@ -54,13 +54,7 @@ export const CreateTokenPhononForm: React.FC<{
     ]);
   };
 
-  const assetDetails = useSelector(
-    (state: RootState) => state.assets.assetDetails
-  );
-
-  const assetDetail = assetDetails.find(
-    (asset) => asset.contractAddress === contractAddress
-  );
+  const assetDetail = useAssetDetails(network.id, contractAddress);
 
   return (
     <>

@@ -23,7 +23,7 @@ import { NewPhonon, AssetTypeId } from "../types";
 import { ethToWei } from "../utils/denomination";
 import { makeChange } from "../utils/math";
 import fundPhonon from "../utils/phonon/funding";
-import useAsset from "../hooks/useAsset";
+import useAssetType from "../hooks/useAssetType";
 import useSessionId from "../hooks/useSession";
 import { getPhononListPath } from "../utils/navigation";
 import { isEVMChain } from "../utils/network";
@@ -33,7 +33,7 @@ import { getAssetDecimals } from "../utils/assets";
 const CreatePhononPage: React.FC = () => {
   const sessionId = useSessionId();
   const network = useNetwork();
-  const asset = useAsset();
+  const asset = useAssetType();
 
   const router = useIonRouter();
   const [isPending, setIsPending] = useState(false);

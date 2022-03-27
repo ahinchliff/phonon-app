@@ -11,7 +11,7 @@ import CreatePhononButton from "../components/CreatePhononButton";
 import PhononListItem from "../components/PhononListItem";
 import RedeemPhononButton from "../components/RedeemPhononButton";
 import SendPhononButton from "../components/SendPhononButton";
-import useAsset from "../hooks/useAsset";
+import useAssetType from "../hooks/useAssetType";
 import useNetwork from "../hooks/useNetwork";
 import useSessionId from "../hooks/useSession";
 import { useFetchPhononsQuery } from "../store/api";
@@ -21,7 +21,7 @@ import { reduceDenominations, sortPhonon } from "../utils/math";
 const PhononsList: React.FC = () => {
   const sessionId = useSessionId();
   const network = useNetwork();
-  const asset = useAsset();
+  const asset = useAssetType();
 
   const { data, refetch, isLoading, isFetching } = useFetchPhononsQuery({
     sessionId,

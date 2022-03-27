@@ -2,7 +2,7 @@ import { useParams } from "react-router";
 import { AssetDetails, ASSETS } from "../constants/assets";
 import { AssetTypeId } from "../types";
 
-const useAsset = (): AssetDetails => {
+const useAssetType = (): AssetDetails => {
   const { assetId: assetIdParam } = useParams<{
     assetId: string;
   }>();
@@ -16,4 +16,4 @@ const useAsset = (): AssetDetails => {
   return assetDetails;
 };
 
-export default useAsset;
+export default useAssetType;

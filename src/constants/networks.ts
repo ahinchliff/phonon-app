@@ -13,9 +13,10 @@ export type NetworkDetails = {
   name: string;
   textColor: string;
   symbol: string;
+  decimals: number;
 };
 
-export const NETWORKS: NetworkIdMap<NetworkDetails> = {
+export const NETWORK_DETAILS: NetworkIdMap<NetworkDetails> = {
   [NetworkId.Unspecified]: {
     id: NetworkId.Unspecified,
     icon: faQuestionCircle,
@@ -23,6 +24,7 @@ export const NETWORKS: NetworkIdMap<NetworkDetails> = {
     name: "None",
     textColor: "text-black",
     symbol: "$",
+    decimals: 0,
   },
   // [NetworkId.Phonon]: {
   //   id: NetworkId.Phonon,
@@ -39,6 +41,7 @@ export const NETWORKS: NetworkIdMap<NetworkDetails> = {
     name: "Bitcoin",
     textColor: "text-yellow-200",
     symbol: "฿",
+    decimals: 8,
   },
   [NetworkId.Ethereum]: {
     id: NetworkId.Ethereum,
@@ -47,6 +50,7 @@ export const NETWORKS: NetworkIdMap<NetworkDetails> = {
     name: "Ethereum",
     textColor: "text-indigo-300",
     symbol: "Ξ",
+    decimals: 18,
   },
   [NetworkId.EthereumRinkeby]: {
     id: NetworkId.EthereumRinkeby,
@@ -55,6 +59,7 @@ export const NETWORKS: NetworkIdMap<NetworkDetails> = {
     name: "Ethereum Rinkeby",
     textColor: "text-indigo-300",
     symbol: "RΞ",
+    decimals: 18,
   },
 };
 
@@ -77,11 +82,4 @@ export const SUPPORTED_ASSET_TYPES_BY_NETWORK: NetworkIdMap<AssetTypeId[]> = {
     AssetTypeId.ERC20,
     AssetTypeId.ERC721,
   ],
-};
-
-export const NATIVE_ASSET_DECIMALS: NetworkIdMap<number> = {
-  [NetworkId.Unspecified]: 0,
-  [NetworkId.Bitcoin]: 8,
-  [NetworkId.Ethereum]: 18,
-  [NetworkId.EthereumRinkeby]: 18,
 };

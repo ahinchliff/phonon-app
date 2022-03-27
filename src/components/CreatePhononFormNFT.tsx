@@ -1,7 +1,11 @@
 import { IonButton } from "@ionic/react";
 import React from "react";
-import { useForm } from "react-hook-form";
-import { NewPhonon } from "../types";
+import { useForm, useWatch } from "react-hook-form";
+import { TAGS } from "../constants/tags";
+import useAssetDetails from "../hooks/useAssetDetails";
+import useNetwork from "../hooks/useNetwork";
+import useSetAssetDetails from "../hooks/useSetAssetDetails";
+import { AssetTypeId, NewPhonon } from "../types";
 
 export type CreatePhononFormNFTValues = {
   contractAddress: string;
@@ -12,31 +16,48 @@ export const CreateNFTPhononForm: React.FC<{
   onSubmit: (newPhonon: NewPhonon[]) => Promise<void>;
   isPending: boolean;
 }> = ({ onSubmit, isPending }) => {
+  const network = useNetwork();
+
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<CreatePhononFormNFTValues>();
+
+  const contractAddress = useWatch({
+    name: "contractAddress",
+    control,
+  });
+
+  useSetAssetDetails(network.id, AssetTypeId.ERC721, contractAddress);
 
   const onSubmitInternal = (data: CreatePhononFormNFTValues) => {
     return onSubmit([
       {
         denomination: "1",
+        decimals: 0,
         tags: [
           {
-            TagName: "TagPhononContractAddress",
+            TagName: TAGS.contractAddress,
             TagValue: data.contractAddress,
           },
-          { TagName: "TagPhononContractTokenID", TagValue: data.tokenId },
+          { TagName: TAGS.tokenId, TagValue: data.tokenId },
         ],
       },
     ]);
   };
 
+  const assetDetail = useAssetDetails(
+    network.id,
+    AssetTypeId.ERC721,
+    contractAddress
+  );
+
   return (
     <>
       <p className="text-xl font-bold text-center text-gray-300 uppercase">
-        CREATE NFT PHONON
+        CREATE {assetDetail?.symbol || "NFT"} PHONON
       </p>
       <form
         className="flex flex-col content-center justify-start h-full gap-2 p-2"

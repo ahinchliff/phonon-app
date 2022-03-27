@@ -1,12 +1,11 @@
 import { IonButton } from "@ionic/react";
-import { ethers } from "ethers";
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import useNetwork from "../hooks/useNetwork";
-import { NewPhonon } from "../types";
-import { useDispatch } from "react-redux";
-import { fetchAssetDetails } from "../store/assetsSlice";
+import { AssetTypeId, NewPhonon } from "../types";
 import useAssetDetails from "../hooks/useAssetDetails";
+import { TAGS } from "../constants/tags";
+import useSetAssetDetails from "../hooks/useSetAssetDetails";
 
 export type CreatePhononFormTokenValues = {
   contractAddress: string;
@@ -18,7 +17,6 @@ export const CreateTokenPhononForm: React.FC<{
   isPending: boolean;
 }> = ({ onSubmit, isPending }) => {
   const network = useNetwork();
-  const dispatch = useDispatch();
 
   const {
     register,
@@ -32,29 +30,32 @@ export const CreateTokenPhononForm: React.FC<{
     control,
   });
 
-  useEffect(() => {
-    if (!ethers.utils.isAddress(contractAddress)) {
-      return;
-    }
+  useSetAssetDetails(network.id, AssetTypeId.ERC20, contractAddress);
 
-    dispatch(fetchAssetDetails({ networkId: network.id, contractAddress }));
-  }, [contractAddress, network, dispatch]);
+  const assetDetail = useAssetDetails(
+    network.id,
+    AssetTypeId.ERC20,
+    contractAddress
+  );
 
   const onSubmitInternal = (data: CreatePhononFormTokenValues) => {
+    if (!assetDetail) {
+      console.error("No asset details");
+      return;
+    }
     return onSubmit([
       {
         denomination: data.amount,
+        decimals: assetDetail.decimals,
         tags: [
           {
-            TagName: "TagPhononContractAddress",
+            TagName: TAGS.contractAddress,
             TagValue: data.contractAddress,
           },
         ],
       },
     ]);
   };
-
-  const assetDetail = useAssetDetails(network.id, contractAddress);
 
   return (
     <>

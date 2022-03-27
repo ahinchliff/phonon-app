@@ -15,13 +15,12 @@ import useAssetType from "../hooks/useAssetType";
 import useNetwork from "../hooks/useNetwork";
 import useSessionId from "../hooks/useSession";
 import { useFetchPhononsQuery } from "../store/api";
-import { weiToEth } from "../utils/denomination";
-import { reduceDenominations, sortPhonon } from "../utils/math";
+import { sortPhonon } from "../utils/math";
 
 const PhononsList: React.FC = () => {
   const sessionId = useSessionId();
   const network = useNetwork();
-  const asset = useAssetType();
+  const assetType = useAssetType();
 
   const { data, refetch, isLoading, isFetching } = useFetchPhononsQuery({
     sessionId,
@@ -32,18 +31,17 @@ const PhononsList: React.FC = () => {
     event.detail.complete();
   }
 
-  const total =
-    data
-      ?.filter((p) => p.CurrencyType === network.id)
-      .map((p) => p.Denomination)
-      .reduce(reduceDenominations, "0") ?? "0";
+  // todo - add totals back in.
+  // const total = data
+  //   ?.filter((p) => p.CurrencyType === network.id && p.ChainID === assetType.id)
+  //   .reduce((sum, next) => sum.add(next.Denomination), ethers.constants.Zero);
 
   return (
     <IonContent>
       <div className="mt-2 text-center">
         <p className="text-md font-extrabold text-zinc-500">WALLET</p>
         <p className="text-xl mb-5">
-          {weiToEth(total)} {network?.symbol}
+          {/* {ethers.utils.formatUnits(total, '18')} {network?.symbol} */}
         </p>
       </div>
 
@@ -76,7 +74,8 @@ const PhononsList: React.FC = () => {
             {data
               ?.filter(
                 (item) =>
-                  item.CurrencyType === network.id && item.ChainID === asset.id
+                  item.CurrencyType === network.id &&
+                  item.ChainID === assetType.id
               )
               .sort(sortPhonon)
               .map((item) => (

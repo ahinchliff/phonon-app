@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { AssetDetails, NetworkId } from "../types";
-import { fetchTokenDetails } from "../utils/assets";
+import { AssetDetails, AssetTypeId, NetworkId } from "../types";
+import { fetchAssetDetails } from "../utils/assets";
 import { assetDetailsLocalStorage } from "../utils/local-storage";
 import { getProvider } from "../utils/providers";
 
@@ -12,28 +12,37 @@ const initialState = {
   assetDetails: assetDetailsLocalStorage.get() || [],
 } as State;
 
-export const fetchAssetDetails = createAsyncThunk(
+export const setAssetDetails = createAsyncThunk(
   "assets/fetchAssetDetails",
-  async (data: { networkId: NetworkId; contractAddress: string }, api) => {
-    const state = api.getState() as State;
+  async (data: {
+    networkId: NetworkId;
+    assetTypeId: AssetTypeId;
+    contractAddress: string;
+  }) => {
+    // const state = api.getState() as State;
 
-    if (
-      state.assetDetails.find(
-        ({ networkId, contractAddress }) =>
-          networkId === data.networkId &&
-          contractAddress === data.contractAddress.toLowerCase()
-      )
-    ) {
-      console.log("No need to fetch asset details");
-      return;
-    }
+    // if (
+    //   state.assetDetails.find(
+    //     ({ networkId, contractAddress }) =>
+    //       networkId === data.networkId &&
+    //       contractAddress?.toLowerCase() === data.contractAddress.toLowerCase()
+    //   )
+    // ) {
+    //   console.log("No need to fetch asset details");
+    //   return;
+    // }
 
     const provider = getProvider(data.networkId);
     if (!provider) {
       return;
     }
 
-    return fetchTokenDetails(data.networkId, data.contractAddress, provider);
+    return fetchAssetDetails(
+      data.networkId,
+      data.assetTypeId,
+      data.contractAddress,
+      provider
+    );
   }
 );
 
@@ -42,14 +51,14 @@ const assetsSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchAssetDetails.fulfilled, (state, action) => {
+    builder.addCase(setAssetDetails.fulfilled, (state, action) => {
       if (!action.payload) {
         return;
       }
 
       const newAssetDetail = {
         ...action.payload,
-        contractAddress: action.payload.contractAddress.toLowerCase(),
+        contractAddress: action.payload.contractAddress?.toLowerCase(),
       };
 
       const updatedAssetDetails = [...state.assetDetails];

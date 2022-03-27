@@ -28,7 +28,6 @@ import useSessionId from "../hooks/useSession";
 import { getPhononListPath } from "../utils/navigation";
 import { isEVMChain } from "../utils/network";
 import { ethers } from "ethers";
-import { getAssetDecimals } from "../utils/assets";
 
 const CreatePhononPage: React.FC = () => {
   const sessionId = useSessionId();
@@ -46,11 +45,7 @@ const CreatePhononPage: React.FC = () => {
       CurrencyType: network.id,
       ChainID: asset.id,
       Denominations: newPhonons.map((np) =>
-        Number(
-          ethers.utils
-            .parseUnits(np.denomination, getAssetDecimals(network.id, asset.id))
-            .toString()
-        )
+        Number(ethers.utils.parseUnits(np.denomination, np.decimals).toString())
       ),
       Tags: newPhonons.map((np) => np.tags || []),
     };
@@ -124,7 +119,8 @@ const CreateNativePhonons: React.FC<CreateNativePhononsProps> = ({
     const newPhonons: NewPhonon[] = change.flatMap((d) => {
       const arr = Array(d.amount);
       const denomination = ethToWei(d.denomination);
-      const newPhonon: NewPhonon = { denomination };
+      // todo - decimals
+      const newPhonon: NewPhonon = { denomination, decimals: 18 };
       return arr.fill(newPhonon) as NewPhonon[];
     });
 
@@ -135,7 +131,8 @@ const CreateNativePhonons: React.FC<CreateNativePhononsProps> = ({
     const newPhonons: NewPhonon[] = data.phononsToCreate.flatMap((d) => {
       const arr = Array(d.amount);
       const denomination = ethToWei(d.denomination);
-      const newPhonon: NewPhonon = { denomination };
+      // todo - decimals
+      const newPhonon: NewPhonon = { denomination, decimals: 18 };
       return arr.fill(newPhonon) as NewPhonon[];
     });
 
@@ -143,7 +140,8 @@ const CreateNativePhonons: React.FC<CreateNativePhononsProps> = ({
   };
 
   const onSubmitSingle = (data: CreatePhononFormSingleValues) => {
-    return onSubmit([{ denomination: data.amount }]);
+    // todo - decimals
+    return onSubmit([{ denomination: data.amount, decimals: 18 }]);
   };
 
   const handleCustomize = () => {

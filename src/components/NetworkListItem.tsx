@@ -10,29 +10,36 @@ import { ethers } from "ethers";
 import React from "react";
 import { useParams } from "react-router";
 import { ASSETS } from "../constants/assets";
-import { NETWORKS } from "../constants/networks";
+import { NETWORK_DETAILS } from "../constants/networks";
+import useAssetDetails from "../hooks/useAssetDetails";
 import "../index.css";
 import { NetworkId, AssetTypeId as AssetTypeId } from "../types";
-import { getAssetDecimals } from "../utils/assets";
 import { getPhononListPath } from "../utils/navigation";
 
 export type Props = {
   networkId: NetworkId;
-  assetId: AssetTypeId;
+  assetTypeId: AssetTypeId;
   value: ethers.BigNumber | undefined;
 };
 
-const NetworkListItem: React.FC<Props> = ({ networkId, assetId, value }) => {
+const NetworkListItem: React.FC<Props> = ({
+  networkId,
+  assetTypeId,
+  value,
+}) => {
   const { sessionId } = useParams<{ sessionId: string }>();
-  const network = NETWORKS[networkId];
-  const asset = ASSETS[assetId];
+  const network = NETWORK_DETAILS[networkId];
+  const asset = ASSETS[assetTypeId];
+
+  const assetDetails = useAssetDetails(networkId, assetTypeId, undefined);
 
   const displayValue =
-    value &&
-    ethers.utils.formatUnits(value, getAssetDecimals(network.id, asset.id));
+    value && assetTypeId === AssetTypeId.Native && assetDetails
+      ? ethers.utils.formatUnits(value, assetDetails.decimals)
+      : value && ethers.utils.formatUnits(value, "0");
 
   return (
-    <IonItem routerLink={getPhononListPath(sessionId, networkId, assetId)}>
+    <IonItem routerLink={getPhononListPath(sessionId, networkId, assetTypeId)}>
       <IonAvatar slot="start">
         <FontAwesomeIcon
           icon={network.icon}

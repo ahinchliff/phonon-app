@@ -11,16 +11,17 @@ import NetworkListItem, {
   Props as NetworkListItemProps,
 } from "../components/NetworkListItem";
 import {
-  NETWORKS,
+  NETWORK_DETAILS,
   SUPPORTED_ASSET_TYPES_BY_NETWORK,
 } from "../constants/networks";
 import { useFetchPhononsQuery } from "../store/api";
+import { AssetTypeId } from "../types";
 
-const ASSET_TYPES = Object.values(NETWORKS).flatMap((network) => {
+const ASSET_TYPES = Object.values(NETWORK_DETAILS).flatMap((network) => {
   const supportedAssets = SUPPORTED_ASSET_TYPES_BY_NETWORK[network.id];
-  return supportedAssets.map((assetId) => ({
+  return supportedAssets.map((assetTypeId) => ({
     networkId: network.id,
-    assetId,
+    assetTypeId,
   }));
 });
 
@@ -29,7 +30,7 @@ const NetworkList: React.FC = () => {
   const { data, refetch } = useFetchPhononsQuery({ sessionId });
 
   // todo - display each token separately
-  // currency we group tokens by their network.
+  // currently we group tokens by their network and assetType.
   const asstTypesWithValue: Omit<NetworkListItemProps, "isLoading">[] =
     useMemo(() => {
       return ASSET_TYPES.map((at) => {
@@ -37,12 +38,13 @@ const NetworkList: React.FC = () => {
           ?.filter(
             (phonon) =>
               phonon.CurrencyType === at.networkId &&
-              phonon.ChainID === at.assetId
+              phonon.ChainID === at.assetTypeId
           )
-          .reduce(
-            (sum, next) => sum.add(next.Denomination),
-            ethers.constants.Zero
-          );
+          .reduce((sum, next) => {
+            return sum.add(
+              at.assetTypeId === AssetTypeId.Native ? next.Denomination : "1"
+            );
+          }, ethers.constants.Zero);
 
         return {
           ...at,
@@ -73,7 +75,7 @@ const NetworkList: React.FC = () => {
         </IonRefresher>
         <IonList>
           {asstTypesWithValue.map((x) => (
-            <NetworkListItem key={`${x.networkId} ${x.assetId}`} {...x} />
+            <NetworkListItem key={`${x.networkId} ${x.assetTypeId}`} {...x} />
           ))}
         </IonList>
       </IonContent>

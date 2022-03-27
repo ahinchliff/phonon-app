@@ -2,13 +2,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IonAvatar, IonItem, IonLabel, IonText } from "@ionic/react";
 import React from "react";
 import { useParams } from "react-router";
-import { NETWORKS } from "../constants/networks";
+import { NETWORK_DETAILS } from "../constants/networks";
 import "../index.css";
 import { NetworkValue } from "../types";
 
 const CustomizationForm: React.FC<NetworkValue> = ({ networkId, value }) => {
   const { sessionId } = useParams<{ sessionId: string }>();
-  const network = NETWORKS[networkId];
+  const network = NETWORK_DETAILS[networkId];
 
   return (
     <IonItem routerLink={`/${sessionId}/${networkId}/`}>

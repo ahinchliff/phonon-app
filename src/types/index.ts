@@ -72,7 +72,7 @@ export type PhononDTO = {
   Denomination: string;
   CurrencyType: NetworkId; // suggestion - name this property NetworkId
   ChainID: AssetTypeId; // suggestion - name this property AssetTypeId
-  ExtendedTLV: Tag[];
+  ExtendedTLV?: Tag[];
 };
 
 export type RedeemPhononDTO = {
@@ -82,18 +82,14 @@ export type RedeemPhononDTO = {
 
 export type NewPhonon = {
   denomination: string;
+  decimals: number;
   tags?: Tag[];
 };
 
-type AssetDetailsBase = {
+export type AssetDetails = {
   networkId: NetworkId;
   assetTypeId: AssetTypeId;
-  contractAddress: string;
   symbol: string;
-};
-
-export type ERC20Details = AssetDetailsBase & {
   decimals: number;
+  contractAddress?: string;
 };
-export type ERC721Details = AssetDetailsBase;
-export type AssetDetails = ERC20Details | ERC721Details;

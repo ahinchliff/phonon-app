@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { TAGS } from "../../constants/tags";
 import { NetworkId, AssetTypeId, PhononDTO } from "../../types";
 import { isEVMChain } from "../network";
 import { ERC20__factory, ERC721__factory } from "./contracts";
@@ -14,8 +15,8 @@ type ERC721FundingData = {
 };
 
 const getERC721FundingData = (phonon: PhononDTO): ERC721FundingData => {
-  const contractAddress = getTagValue(phonon, "TagPhononContractAddress");
-  const tokenId = getTagValue(phonon, "TagPhononContractTokenID");
+  const contractAddress = getTagValue(phonon, TAGS.contractAddress);
+  const tokenId = getTagValue(phonon, TAGS.tokenId);
 
   if (!contractAddress || !tokenId) {
     throw Error(
@@ -32,7 +33,7 @@ const getERC721FundingData = (phonon: PhononDTO): ERC721FundingData => {
 };
 
 const getERC20FundingData = (phonon: PhononDTO): ERC20FundingData => {
-  const contractAddress = getTagValue(phonon, "TagPhononContractAddress");
+  const contractAddress = getTagValue(phonon, TAGS.contractAddress);
 
   if (!contractAddress) {
     throw Error(`Invalid funding data - no contract address`);

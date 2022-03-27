@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { AssetDetails, NetworkId } from "../types";
 import { fetchTokenDetails } from "../utils/assets";
 import { assetDetailsLocalStorage } from "../utils/local-storage";
@@ -28,7 +28,6 @@ export const fetchAssetDetails = createAsyncThunk(
       return;
     }
 
-    console.log("------");
     const provider = getProvider(data.networkId);
     if (!provider) {
       return;

@@ -2,7 +2,6 @@ import { IonButton } from "@ionic/react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { isValidPhononDenomination } from "../utils/validation";
-// import * as yup from "yup";
 
 export type CreatePhononFormSingleValues = {
   amount: string;

@@ -14,7 +14,6 @@ import { NETWORKS } from "../constants/networks";
 import "../index.css";
 import { NetworkId, AssetTypeId as AssetTypeId } from "../types";
 import { getAssetDecimals } from "../utils/assets";
-import { weiToEth } from "../utils/denomination";
 import { getPhononListPath } from "../utils/navigation";
 
 export type Props = {

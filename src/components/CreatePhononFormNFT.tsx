@@ -2,7 +2,6 @@ import { IonButton } from "@ionic/react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { NewPhonon } from "../types";
-// import * as yup from "yup";
 
 export type CreatePhononFormNFTValues = {
   contractAddress: string;

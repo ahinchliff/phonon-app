@@ -1,7 +1,11 @@
 import { IonButton } from "@ionic/react";
-import React from "react";
-import { useForm } from "react-hook-form";
+import { ethers } from "ethers";
+import React, { useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import useNetwork from "../hooks/useNetwork";
 import { NewPhonon } from "../types";
+import { fetchTokenDetails, TokenDetails } from "../utils/phonon/asset-data";
+import { getProvider } from "../utils/providers";
 
 export type CreatePhononFormTokenValues = {
   contractAddress: string;
@@ -12,11 +16,36 @@ export const CreateTokenPhononForm: React.FC<{
   onSubmit: (newPhonon: NewPhonon[]) => Promise<void>;
   isPending: boolean;
 }> = ({ onSubmit, isPending }) => {
+  const network = useNetwork();
+
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<CreatePhononFormTokenValues>();
+
+  const [tokenDetails, setTokenDetails] = React.useState<TokenDetails>();
+
+  const contractAddress = useWatch({
+    name: "contractAddress",
+    control,
+  });
+
+  useEffect(() => {
+    if (!ethers.utils.isAddress(contractAddress)) {
+      return;
+    }
+    const provider = getProvider(network.id);
+
+    if (!provider) {
+      return;
+    }
+
+    fetchTokenDetails(contractAddress, provider)
+      .then(setTokenDetails)
+      .catch(console.error);
+  }, [contractAddress]);
 
   const onSubmitInternal = (data: CreatePhononFormTokenValues) => {
     return onSubmit([
@@ -35,8 +64,9 @@ export const CreateTokenPhononForm: React.FC<{
   return (
     <>
       <p className="text-xl font-bold text-center text-gray-300 uppercase">
-        CREATE TOKEN PHONON
+        CREATE {tokenDetails?.symbol || "TOKEN"} PHONON
       </p>
+
       <form
         className="flex flex-col content-center justify-start h-full gap-2 p-2"
         onSubmit={handleSubmit(onSubmitInternal)}

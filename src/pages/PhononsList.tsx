@@ -11,6 +11,7 @@ import CreatePhononButton from "../components/CreatePhononButton";
 import PhononListItem from "../components/PhononListItem";
 import RedeemPhononButton from "../components/RedeemPhononButton";
 import SendPhononButton from "../components/SendPhononButton";
+import useAsset from "../hooks/useAsset";
 import useNetwork from "../hooks/useNetwork";
 import useSessionId from "../hooks/useSession";
 import { useFetchPhononsQuery } from "../store/api";
@@ -20,8 +21,8 @@ import { reduceDenominations, sortPhonon } from "../utils/math";
 const PhononsList: React.FC = () => {
   const sessionId = useSessionId();
   const network = useNetwork();
+  const asset = useAsset();
 
-  // todo - filter by asset type here (currently ChainId)
   const { data, refetch, isLoading, isFetching } = useFetchPhononsQuery({
     sessionId,
   });
@@ -73,7 +74,10 @@ const PhononsList: React.FC = () => {
           </IonRefresher>
           <IonList>
             {data
-              ?.filter((item) => item.CurrencyType === network.id)
+              ?.filter(
+                (item) =>
+                  item.CurrencyType === network.id && item.ChainID === asset.id
+              )
               .sort(sortPhonon)
               .map((item) => (
                 <PhononListItem phonon={item} key={item.PubKey} />

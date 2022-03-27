@@ -42,8 +42,6 @@ const getERC20FundingData = (phonon: PhononDTO): ERC20FundingData => {
 };
 
 const fundPhonon = async (phonon: PhononDTO): Promise<void> => {
-  console.log(phonon);
-
   if (isEVMChain(phonon.CurrencyType)) {
     // @ts-expect-error - window
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -58,7 +56,7 @@ const fundPhonon = async (phonon: PhononDTO): Promise<void> => {
       await (
         await signer.sendTransaction({
           to: phonon.Address,
-          value: phonon.Denomination,
+          value: ethers.BigNumber.from(phonon.Denomination.toString()),
         })
       ).wait();
       return;

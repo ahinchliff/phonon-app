@@ -78,3 +78,10 @@ export const SUPPORTED_ASSET_TYPES_BY_NETWORK: NetworkIdMap<AssetTypeId[]> = {
     AssetTypeId.ERC721,
   ],
 };
+
+export const NATIVE_ASSET_DECIMALS: NetworkIdMap<number> = {
+  [NetworkId.Unspecified]: 0,
+  [NetworkId.Bitcoin]: 8,
+  [NetworkId.Ethereum]: 18,
+  [NetworkId.EthereumRinkeby]: 18,
+};

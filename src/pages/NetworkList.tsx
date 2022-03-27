@@ -5,54 +5,51 @@ import {
   IonRefresherContent,
 } from "@ionic/react";
 import { ethers } from "ethers";
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import NetworkListItem, {
   Props as NetworkListItemProps,
 } from "../components/NetworkListItem";
 import {
-  NetworkDetails,
   NETWORKS,
   SUPPORTED_ASSET_TYPES_BY_NETWORK,
 } from "../constants/networks";
 import { useFetchPhononsQuery } from "../store/api";
-import { AssetTypeId, NetworkId, NetworkValue } from "../types";
-import { reduceDenominations } from "../utils/math";
+
+const ASSET_TYPES = Object.values(NETWORKS).flatMap((network) => {
+  const supportedAssets = SUPPORTED_ASSET_TYPES_BY_NETWORK[network.id];
+  return supportedAssets.map((assetId) => ({
+    networkId: network.id,
+    assetId,
+  }));
+});
 
 const NetworkList: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
-  const { data, refetch, isLoading } = useFetchPhononsQuery({ sessionId });
-  const [networkValues, setNetworkValues] = useState<NetworkValue[] | null>(
-    null
-  );
+  const { data, refetch } = useFetchPhononsQuery({ sessionId });
 
-  const networkWithAssetType: Omit<NetworkListItemProps, "isLoading">[] =
-    Object.values(NETWORKS).flatMap((network) => {
-      const supportedAssets = SUPPORTED_ASSET_TYPES_BY_NETWORK[network.id];
-      return supportedAssets.map((assetId) => ({
-        networkId: network.id,
-        assetId,
-        value: ethers.constants.Zero, // todo
-      }));
-    });
+  // todo - display each token separately
+  // currency we group tokens by their network.
+  const asstTypesWithValue: Omit<NetworkListItemProps, "isLoading">[] =
+    useMemo(() => {
+      return ASSET_TYPES.map((at) => {
+        const value = data
+          ?.filter(
+            (phonon) =>
+              phonon.CurrencyType === at.networkId &&
+              phonon.ChainID === at.assetId
+          )
+          .reduce(
+            (sum, next) => sum.add(next.Denomination),
+            ethers.constants.Zero
+          );
 
-  // useEffect(() => {
-  //   const totalValueByNetwork: NetworkValue[] = Object.values(NETWORKS).map(
-  //     (network, i) => {
-  //       return {
-  //         value: parseInt(
-  //           data
-  //             ?.filter((p) => p.AssetType === i)
-  //             .map((p) => p.Denomination)
-  //             .reduce(reduceDenominations, "0") ?? ""
-  //         ),
-  //         networkId: i,
-  //       };
-  //     }
-  //   );
-
-  //   setNetworkValues(totalValueByNetwork);
-  // }, [data]);
+        return {
+          ...at,
+          value,
+        };
+      });
+    }, [data]);
 
   function refresh(event: CustomEvent<any>) {
     refetch();
@@ -75,12 +72,8 @@ const NetworkList: React.FC = () => {
           <IonRefresherContent />
         </IonRefresher>
         <IonList>
-          {networkWithAssetType.map((x) => (
-            <NetworkListItem
-              key={`${x.networkId} ${x.assetId}`}
-              isLoading={isLoading}
-              {...x}
-            />
+          {asstTypesWithValue.map((x) => (
+            <NetworkListItem key={`${x.networkId} ${x.assetId}`} {...x} />
           ))}
         </IonList>
       </IonContent>

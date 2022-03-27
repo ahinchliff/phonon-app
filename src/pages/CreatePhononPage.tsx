@@ -23,11 +23,12 @@ import { NewPhonon, AssetTypeId } from "../types";
 import { ethToWei } from "../utils/denomination";
 import { makeChange } from "../utils/math";
 import fundPhonon from "../utils/phonon/funding";
-import { EVM_NETWORKS_TO_CHAIN_ID } from "../constants/networks";
 import useAsset from "../hooks/useAsset";
 import useSessionId from "../hooks/useSession";
 import { getPhononListPath } from "../utils/navigation";
 import { isEVMChain } from "../utils/network";
+import { ethers } from "ethers";
+import { getAssetDecimals } from "../utils/assets";
 
 const CreatePhononPage: React.FC = () => {
   const sessionId = useSessionId();
@@ -43,10 +44,14 @@ const CreatePhononPage: React.FC = () => {
     setIsPending(true);
     const payload = {
       CurrencyType: network.id,
-      ChainId: asset.id,
-      // sending deonomination as a number seems dangerous but
-      // client rejects strings
-      Denominations: newPhonons.map((np) => Number(np.denomination)),
+      ChainID: asset.id,
+      Denominations: newPhonons.map((np) =>
+        Number(
+          ethers.utils
+            .parseUnits(np.denomination, getAssetDecimals(network.id, asset.id))
+            .toString()
+        )
+      ),
       Tags: newPhonons.map((np) => np.tags || []),
     };
     // Consider doing basic error checking BEFORE creating the phonon,

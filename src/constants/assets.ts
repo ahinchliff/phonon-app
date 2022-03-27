@@ -1,4 +1,4 @@
-import { AssetTypeId, AssetTypeIdMap } from "../types";
+import { AssetTypeId, AssetTypeIdMap, NetworkId, NetworkIdMap } from "../types";
 
 export type AssetDetails = {
   id: AssetTypeId;

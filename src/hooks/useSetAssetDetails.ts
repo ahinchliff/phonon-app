@@ -54,6 +54,7 @@ const useSetAssetDetails = (
     assetTypeId,
     existing,
     fetchingAssetDetails,
+    fetchAssetDetailsError,
     dispatch,
   ]);
 

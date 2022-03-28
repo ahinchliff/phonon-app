@@ -1,4 +1,4 @@
-import { AssetDetails } from "../types";
+import { AssetDetails, SessionNames } from "../types";
 
 const createStorage = <T>(key: string) => {
   return {

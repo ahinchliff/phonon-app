@@ -22,17 +22,11 @@ const useAssetDetails = (
     };
   }
 
-  const assetDetail = assetDetails.find(
+  return assetDetails.find(
     (asset) =>
       asset.networkId === networkId &&
       asset.contractAddress?.toLowerCase() === contractAddress?.toLowerCase()
   );
-
-  if (!assetDetail) {
-    return;
-  }
-
-  return assetDetail;
 };
 
 export default useAssetDetails;

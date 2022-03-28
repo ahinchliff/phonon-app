@@ -36,7 +36,6 @@ export const CreateNFTPhononForm: React.FC<{
     return onSubmit([
       {
         denomination: "1",
-        decimals: 0,
         tags: [
           {
             TagName: TAGS.contractAddress,

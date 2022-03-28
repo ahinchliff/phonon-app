@@ -55,6 +55,7 @@ const assetsSlice = createSlice({
       state.fetchingAssetDetails = true;
     });
     builder.addCase(setAssetDetails.fulfilled, (state, action) => {
+      state.fetchingAssetDetails = false;
       state.fetchAssetDetailsError = undefined;
       if (!action.payload) {
         return;

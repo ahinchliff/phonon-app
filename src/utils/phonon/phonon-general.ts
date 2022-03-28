@@ -6,5 +6,5 @@ export const getTagValue = (
 ): string | undefined => {
   return phonon.ExtendedTLV?.filter((tag) => {
     return tag.TagName === tagName;
-  })[0].TagValue;
+  })[0]?.TagValue;
 };

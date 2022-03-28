@@ -27,7 +27,6 @@ import useAssetType from "../hooks/useAssetType";
 import useSessionId from "../hooks/useSession";
 import { getPhononListPath } from "../utils/navigation";
 import { isEVMChain } from "../utils/network";
-import { ethers } from "ethers";
 
 const CreatePhononPage: React.FC = () => {
   const sessionId = useSessionId();
@@ -44,9 +43,7 @@ const CreatePhononPage: React.FC = () => {
     const payload = {
       CurrencyType: network.id,
       ChainID: asset.id,
-      Denominations: newPhonons.map((np) =>
-        Number(ethers.utils.parseUnits(np.denomination, np.decimals).toString())
-      ),
+      Denominations: newPhonons.map((np) => np.denomination),
       Tags: newPhonons.map((np) => np.tags || []),
     };
     // Consider doing basic error checking BEFORE creating the phonon,
@@ -120,7 +117,7 @@ const CreateNativePhonons: React.FC<CreateNativePhononsProps> = ({
       const arr = Array(d.amount);
       const denomination = ethToWei(d.denomination);
       // todo - decimals
-      const newPhonon: NewPhonon = { denomination, decimals: 18 };
+      const newPhonon: NewPhonon = { denomination };
       return arr.fill(newPhonon) as NewPhonon[];
     });
 
@@ -132,7 +129,7 @@ const CreateNativePhonons: React.FC<CreateNativePhononsProps> = ({
       const arr = Array(d.amount);
       const denomination = ethToWei(d.denomination);
       // todo - decimals
-      const newPhonon: NewPhonon = { denomination, decimals: 18 };
+      const newPhonon: NewPhonon = { denomination };
       return arr.fill(newPhonon) as NewPhonon[];
     });
 
@@ -141,7 +138,7 @@ const CreateNativePhonons: React.FC<CreateNativePhononsProps> = ({
 
   const onSubmitSingle = (data: CreatePhononFormSingleValues) => {
     // todo - decimals
-    return onSubmit([{ denomination: data.amount, decimals: 18 }]);
+    return onSubmit([{ denomination: data.amount }]);
   };
 
   const handleCustomize = () => {

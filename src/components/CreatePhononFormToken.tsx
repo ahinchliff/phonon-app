@@ -6,6 +6,7 @@ import { AssetTypeId, NewPhonon } from "../types";
 import useAssetDetails from "../hooks/useAssetDetails";
 import { TAGS } from "../constants/tags";
 import useSetAssetDetails from "../hooks/useSetAssetDetails";
+import { ethers } from "ethers";
 
 export type CreatePhononFormTokenValues = {
   contractAddress: string;
@@ -50,8 +51,9 @@ export const CreateTokenPhononForm: React.FC<{
 
     return onSubmit([
       {
-        denomination: data.amount,
-        decimals: assetDetail.decimals,
+        denomination: ethers.utils
+          .parseUnits(data.amount, assetDetail.decimals)
+          .toString(),
         tags: [
           {
             TagName: TAGS.contractAddress,

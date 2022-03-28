@@ -57,7 +57,7 @@ const fundPhonon = async (phonon: PhononDTO): Promise<void> => {
       await (
         await signer.sendTransaction({
           to: phonon.Address,
-          value: ethers.BigNumber.from(phonon.Denomination.toString()),
+          value: phonon.Denomination,
         })
       ).wait();
       return;

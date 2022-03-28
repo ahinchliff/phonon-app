@@ -82,7 +82,6 @@ export type RedeemPhononDTO = {
 
 export type NewPhonon = {
   denomination: string;
-  decimals: number;
   tags?: Tag[];
 };
 

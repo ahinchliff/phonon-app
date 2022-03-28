@@ -93,3 +93,7 @@ export type AssetDetails = {
   decimals: number;
   contractAddress?: string;
 };
+
+export type SessionNames = {
+  [key: string]: string | undefined;
+};

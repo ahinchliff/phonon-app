@@ -13,3 +13,6 @@ const createStorage = <T>(key: string) => {
 
 export const assetDetailsLocalStorage =
   createStorage<AssetDetails[]>("TOKEN_DETAILS");
+
+export const sessionNamesLocalStorage =
+  createStorage<SessionNames>("SESSION_NAMES");

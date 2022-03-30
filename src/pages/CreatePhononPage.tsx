@@ -47,6 +47,7 @@ const CreatePhononPage: React.FC = () => {
 
   const onSubmit = async (newPhonons: NewPhonon[]) => {
     setIsPending(true);
+
     const payload = {
       CurrencyType: network.id,
       ChainID: assetType.id,

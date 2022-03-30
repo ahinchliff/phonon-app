@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { isValidPhononDenomination } from "../utils/validation";
 
 export type CreatePhononFormSingleValues = {
-  amount: string;
+  denomination: string;
 };
 
 export const CreatePhononFormSingle: React.FC<{
@@ -26,17 +26,17 @@ export const CreatePhononFormSingle: React.FC<{
         className="text-bold p-2 text-xl bg-zinc-800 shadow-inner"
         placeholder="Amount"
         disabled={isPending}
-        {...register("amount", {
+        {...register("denomination", {
           required: true,
           validate: isValidPhononDenomination,
         })}
       />
-      {errors?.amount?.type === "required" && (
+      {errors?.denomination?.type === "required" && (
         <p className="text-bold p-2 text-xl text-zinc-200 shadow-inner">
           Amount is required.
         </p>
       )}
-      {errors?.amount?.type === "validate" && (
+      {errors?.denomination?.type === "validate" && (
         <p className="text-bold p-2 text-xl text-zinc-200 shadow-inner">
           First three digits must be less than 255.
         </p>

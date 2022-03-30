@@ -3,7 +3,6 @@ import React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { NETWORK_DETAILS } from "../constants/networks";
 import { TAGS } from "../constants/tags";
-import useAssetDetails from "../hooks/useAssetDetails";
 import useSetAssetDetails from "../hooks/useSetAssetDetails";
 import { AssetTypeId, NetworkId, NewPhonon } from "../types";
 
@@ -47,12 +46,6 @@ export const CreateNFTPhononForm: React.FC<{
       },
     ]);
   };
-
-  const assetDetail = useAssetDetails(
-    network.id,
-    AssetTypeId.ERC721,
-    contractAddress
-  );
 
   return (
     <form

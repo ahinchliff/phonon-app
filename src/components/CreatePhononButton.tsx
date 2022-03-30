@@ -1,19 +1,16 @@
 import React from "react";
 import { IonButton, IonIcon, useIonRouter } from "@ionic/react";
 import { addSharp } from "ionicons/icons";
-import { useParams } from "react-router";
 import { getCreatePath } from "../utils/navigation";
+import useSessionIdFromParams from "../hooks/useSessionIdFromParams";
 
-export default function CreatePhononButton() {
-  const { sessionId, networkId, assetId } = useParams<{
-    sessionId: string;
-    networkId: string;
-    assetId: string;
-  }>();
+export const CreatePhononButton = () => {
   const router = useIonRouter();
 
+  const sessionId = useSessionIdFromParams();
+
   const goToCreatePage = () => {
-    router.push(getCreatePath(sessionId, networkId, assetId));
+    router.push(getCreatePath(sessionId));
   };
 
   return (
@@ -30,4 +27,6 @@ export default function CreatePhononButton() {
       </IonButton>
     </>
   );
-}
+};
+
+export default CreatePhononButton;

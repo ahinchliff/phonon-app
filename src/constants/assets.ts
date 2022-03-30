@@ -1,11 +1,11 @@
 import { AssetTypeId, AssetTypeIdMap } from "../types";
 
-export type AssetDetails = {
+export type AssetTypeDetails = {
   id: AssetTypeId;
   name: string;
 };
 
-export const ASSETS: AssetTypeIdMap<AssetDetails> = {
+export const ASSET_TYPES: AssetTypeIdMap<AssetTypeDetails> = {
   [AssetTypeId.Native]: {
     id: AssetTypeId.Native,
     name: "Native",

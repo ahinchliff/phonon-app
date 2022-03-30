@@ -1,7 +1,7 @@
 import { IonButton } from "@ionic/react";
 import React from "react";
 import { useForm, useWatch } from "react-hook-form";
-import useNetwork from "../hooks/useNetwork";
+import useNetworkFromParams from "../hooks/useNetworkFromParams";
 import { usePhonons } from "../hooks/usePhonons";
 import { weiToEth } from "../utils/denomination";
 import { makeChangeWithPhonons, reduceDenominations } from "../utils/math";
@@ -15,7 +15,7 @@ export const RedeemPhononFormSuggested: React.FC<{
   onSubmit: any;
   isPending: boolean;
 }> = ({ handleCustomize, onSubmit, isPending }) => {
-  const network = useNetwork();
+  const network = useNetworkFromParams();
 
   const { register, handleSubmit, control } =
     useForm<RedeemPhononFormSuggestedValues>();

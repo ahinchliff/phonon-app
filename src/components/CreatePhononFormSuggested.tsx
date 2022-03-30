@@ -1,7 +1,8 @@
 import { IonButton } from "@ionic/react";
 import React from "react";
 import { useForm, useWatch } from "react-hook-form";
-import useNetwork from "../hooks/useNetwork";
+import { NETWORK_DETAILS } from "../constants/networks";
+import { NetworkId } from "../types";
 import { makeChange } from "../utils/math";
 
 export type CreatePhononFormSuggestedValues = {
@@ -12,8 +13,9 @@ export const CreatePhononFormSuggested: React.FC<{
   handleCustomize: () => void;
   onSubmit: any;
   isPending: boolean;
-}> = ({ handleCustomize, onSubmit, isPending }) => {
-  const network = useNetwork();
+  networkId: NetworkId;
+}> = ({ handleCustomize, onSubmit, isPending, networkId }) => {
+  const network = NETWORK_DETAILS[networkId];
 
   const { register, handleSubmit, control } =
     useForm<CreatePhononFormSuggestedValues>();

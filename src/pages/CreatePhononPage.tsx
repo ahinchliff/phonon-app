@@ -1,48 +1,55 @@
-import { IonButton, useIonRouter } from "@ionic/react";
+import { useIonRouter, IonSelect, IonSelectOption } from "@ionic/react";
 import React, { useState } from "react";
-import {
-  CreatePhononFormCustom,
-  CreatePhononFormCustomValues,
-} from "../components/CreatePhononFormCustom";
-import {
-  CreatePhononFormSingle,
-  CreatePhononFormSingleValues,
-} from "../components/CreatePhononFormSingle";
-import {
-  CreatePhononFormSuggested,
-  CreatePhononFormSuggestedValues,
-} from "../components/CreatePhononFormSuggested";
+import { CreateNativePhonons } from "../components/CreatePhononFormNative";
 import { CreateNFTPhononForm } from "../components/CreatePhononFormNFT";
 import { CreateTokenPhononForm } from "../components/CreatePhononFormToken";
-import useNetwork from "../hooks/useNetwork";
 import {
   useFinalizeDepositMutation,
   useInitDepositMutation,
 } from "../store/api";
-import { NewPhonon, AssetTypeId } from "../types";
-import { ethToWei } from "../utils/denomination";
-import { makeChange } from "../utils/math";
+import { NewPhonon, AssetTypeId, NetworkId } from "../types";
 import fundPhonon from "../utils/phonon/funding";
-import useAssetType from "../hooks/useAssetType";
-import useSessionId from "../hooks/useSession";
+import useSessionIdFromParams from "../hooks/useSessionIdFromParams";
 import { getPhononListPath } from "../utils/navigation";
 import { isEVMChain } from "../utils/network";
+import {
+  NetworkDetails,
+  NETWORK_DETAILS,
+  SUPPORTED_ASSET_TYPES_BY_NETWORK,
+} from "../constants/networks";
+import { ASSET_TYPES } from "../constants/assets";
+
+const DEFAULT_NETWORK_ID = NetworkId.Bitcoin;
+const DEFAULT_ASSET_TYPE_ID = AssetTypeId.Native;
 
 const CreatePhononPage: React.FC = () => {
-  const sessionId = useSessionId();
-  const network = useNetwork();
-  const asset = useAssetType();
+  const sessionId = useSessionIdFromParams();
+  const [networkId, setNetworkId] = useState<NetworkId>(DEFAULT_NETWORK_ID);
+  const [assetTypeId, setAssetTypeId] = useState<AssetTypeId>(
+    DEFAULT_ASSET_TYPE_ID
+  );
+  const [isPending, setIsPending] = useState(false);
+
+  const assetType = ASSET_TYPES[assetTypeId];
+  const network = NETWORK_DETAILS[networkId];
 
   const router = useIonRouter();
-  const [isPending, setIsPending] = useState(false);
   const [initDeposit] = useInitDepositMutation();
   const [finalizeDeposit] = useFinalizeDepositMutation();
+
+  const onChangeSelectedNetwork = (networkId: NetworkId) => {
+    setNetworkId(networkId);
+    const supportedAssets = SUPPORTED_ASSET_TYPES_BY_NETWORK[networkId];
+    if (!supportedAssets.includes(assetTypeId)) {
+      setAssetTypeId(supportedAssets[0]);
+    }
+  };
 
   const onSubmit = async (newPhonons: NewPhonon[]) => {
     setIsPending(true);
     const payload = {
       CurrencyType: network.id,
-      ChainID: asset.id,
+      ChainID: assetType.id,
       Denominations: newPhonons.map((np) => np.denomination),
       Tags: newPhonons.map((np) => np.tags || []),
     };
@@ -81,114 +88,81 @@ const CreatePhononPage: React.FC = () => {
           })
         );
         setIsPending(false);
-        router.push(getPhononListPath(sessionId, network.id, asset.id));
+        router.push(getPhononListPath(sessionId, network.id, assetType.id));
       });
   };
 
-  if (asset.id === AssetTypeId.ERC721) {
-    return <CreateNFTPhononForm isPending={isPending} onSubmit={onSubmit} />;
-  }
+  const content = () => {
+    if (assetType.id === AssetTypeId.ERC721) {
+      return (
+        <CreateNFTPhononForm
+          isPending={isPending}
+          networkId={networkId}
+          onSubmit={onSubmit}
+        />
+      );
+    }
 
-  if (asset.id === AssetTypeId.ERC20) {
-    return <CreateTokenPhononForm isPending={isPending} onSubmit={onSubmit} />;
-  }
+    if (assetType.id === AssetTypeId.ERC20) {
+      return (
+        <CreateTokenPhononForm
+          isPending={isPending}
+          networkId={networkId}
+          onSubmit={onSubmit}
+        />
+      );
+    }
 
-  return <CreateNativePhonons isPending={isPending} onSubmit={onSubmit} />;
-};
-
-export default CreatePhononPage;
-
-type CreateNativePhononsProps = {
-  isPending: boolean;
-  onSubmit: (newPhonons: NewPhonon[]) => Promise<void>;
-};
-
-const CreateNativePhonons: React.FC<CreateNativePhononsProps> = ({
-  isPending,
-  onSubmit,
-}) => {
-  const [isCustomizing, setIsCustomizing] = useState(false);
-  const [isMassCreating, setIsMassCreating] = useState(false);
-  const network = useNetwork();
-
-  const onSubmitSuggested = (data: CreatePhononFormSuggestedValues) => {
-    const change = makeChange(parseFloat(data.amount));
-    const newPhonons: NewPhonon[] = change.flatMap((d) => {
-      const arr = Array(d.amount);
-      const denomination = ethToWei(d.denomination);
-      // todo - decimals
-      const newPhonon: NewPhonon = { denomination };
-      return arr.fill(newPhonon) as NewPhonon[];
-    });
-
-    return onSubmit(newPhonons);
-  };
-
-  const onSubmitCustomized = (data: CreatePhononFormCustomValues) => {
-    const newPhonons: NewPhonon[] = data.phononsToCreate.flatMap((d) => {
-      const arr = Array(d.amount);
-      const denomination = ethToWei(d.denomination);
-      // todo - decimals
-      const newPhonon: NewPhonon = { denomination };
-      return arr.fill(newPhonon) as NewPhonon[];
-    });
-
-    return onSubmit(newPhonons);
-  };
-
-  const onSubmitSingle = (data: CreatePhononFormSingleValues) => {
-    // todo - decimals
-    return onSubmit([{ denomination: data.amount }]);
-  };
-
-  const handleCustomize = () => {
-    setIsCustomizing(true);
-  };
-
-  const handleSuggest = () => {
-    setIsCustomizing(false);
+    return (
+      <CreateNativePhonons
+        isPending={isPending}
+        networkId={networkId}
+        onSubmit={onSubmit}
+      />
+    );
   };
 
   return (
-    <div>
-      <p className="text-xl font-bold text-center text-gray-300 uppercase">
-        CREATE {network.ticker} PHONON
+    <>
+      <p className="text-xl mt-3 font-bold text-center text-gray-300 uppercase">
+        CREATE PHONON
       </p>
-      {isMassCreating ? (
-        <>
-          <IonButton
-            expand="full"
-            fill="clear"
-            type="button"
-            onClick={() => setIsMassCreating(false)}
-          >
-            Creating Many Phonons
-          </IonButton>
-          {isCustomizing ? (
-            <CreatePhononFormCustom
-              {...{ handleSuggest, onSubmit: onSubmitCustomized, isPending }}
-            />
-          ) : (
-            <CreatePhononFormSuggested
-              {...{ handleCustomize, onSubmit: onSubmitSuggested, isPending }}
-            />
-          )}
-        </>
-      ) : (
-        <>
-          <IonButton
-            expand="full"
-            fill="clear"
-            type="button"
-            onClick={() => setIsMassCreating(true)}
-          >
-            Creating Single Phonon
-          </IonButton>{" "}
-          <CreatePhononFormSingle
-            {...{ handleCustomize, onSubmit: onSubmitSingle, isPending }}
-          />
-        </>
-      )}
-    </div>
+      <IonSelect
+        value={networkId}
+        okText="Okay"
+        cancelText="Dismiss"
+        onIonChange={(e) => onChangeSelectedNetwork(e.detail.value)}
+      >
+        {Object.keys(NETWORK_DETAILS).map((networkId) => {
+          const net = NETWORK_DETAILS[networkId] as NetworkDetails;
+          return (
+            <IonSelectOption key={net.id} value={net.id}>
+              {net.name}
+            </IonSelectOption>
+          );
+        })}
+      </IonSelect>
+
+      <IonSelect
+        value={assetTypeId}
+        okText="Okay"
+        cancelText="Dismiss"
+        onIonChange={(e) => setAssetTypeId(e.detail.value)}
+      >
+        {SUPPORTED_ASSET_TYPES_BY_NETWORK[networkId].map((aid) => {
+          const a = ASSET_TYPES[aid];
+
+          return (
+            <IonSelectOption key={a.id} value={a.id}>
+              {a.name}
+            </IonSelectOption>
+          );
+        })}
+      </IonSelect>
+
+      {content()}
+    </>
   );
 };
+
+export default CreatePhononPage;

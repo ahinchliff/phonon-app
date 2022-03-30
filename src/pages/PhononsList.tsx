@@ -11,16 +11,16 @@ import CreatePhononButton from "../components/CreatePhononButton";
 import PhononListItem from "../components/PhononListItem";
 import RedeemPhononButton from "../components/RedeemPhononButton";
 import SendPhononButton from "../components/SendPhononButton";
-import useAssetType from "../hooks/useAssetType";
-import useNetwork from "../hooks/useNetwork";
-import useSessionId from "../hooks/useSession";
+import useAssetTypeFromParams from "../hooks/useAssetTypeFromParams";
+import useNetworkFromParams from "../hooks/useNetworkFromParams";
+import useSessionIdFromParams from "../hooks/useSessionIdFromParams";
 import { useFetchPhononsQuery } from "../store/api";
 import { sortPhonon } from "../utils/math";
 
 const PhononsList: React.FC = () => {
-  const sessionId = useSessionId();
-  const network = useNetwork();
-  const assetType = useAssetType();
+  const sessionId = useSessionIdFromParams();
+  const network = useNetworkFromParams();
+  const assetType = useAssetTypeFromParams();
 
   const { data, refetch, isLoading, isFetching } = useFetchPhononsQuery({
     sessionId,

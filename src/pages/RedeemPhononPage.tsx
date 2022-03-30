@@ -10,7 +10,7 @@ import {
   RedeemPhononFormSuggested,
   RedeemPhononFormSuggestedValues,
 } from "../components/RedeemPhononFormSuggested";
-import useNetwork from "../hooks/useNetwork";
+import useNetworkFromParams from "../hooks/useNetworkFromParams";
 import { usePhonons } from "../hooks/usePhonons";
 import { useRedeemPhononMutation } from "../store/api";
 import { RedeemPhononDTO } from "../types";
@@ -26,7 +26,7 @@ const RedeemPhononPage: React.FC = () => {
   const [isPending, setIsPending] = useState(false);
   const [RedeemAddress, setRedeemAddress] = useState("");
   const [redeemPhonon] = useRedeemPhononMutation();
-  const network = useNetwork();
+  const network = useNetworkFromParams();
   const { phonons } = usePhonons();
 
   const getAddress = async () => {

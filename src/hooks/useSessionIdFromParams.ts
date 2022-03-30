@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 
-const useSessionId = (): string => {
+const useSessionIdFromParams = (): string => {
   const { sessionId } = useParams<{
     sessionId: string;
   }>();
@@ -12,4 +12,4 @@ const useSessionId = (): string => {
   return sessionId;
 };
 
-export default useSessionId;
+export default useSessionIdFromParams;

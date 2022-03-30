@@ -1,13 +1,13 @@
 import { useParams } from "react-router";
-import { AssetDetails, ASSETS } from "../constants/assets";
+import { AssetTypeDetails, ASSET_TYPES } from "../constants/assets";
 import { AssetTypeId } from "../types";
 
-const useAssetType = (): AssetDetails => {
+const useAssetTypeFromParams = (): AssetTypeDetails => {
   const { assetId: assetIdParam } = useParams<{
     assetId: string;
   }>();
   const assetId = parseInt(assetIdParam) as AssetTypeId;
-  const assetDetails = ASSETS[assetId];
+  const assetDetails = ASSET_TYPES[assetId];
 
   if (!assetDetails) {
     throw Error("No asset found");
@@ -16,4 +16,4 @@ const useAssetType = (): AssetDetails => {
   return assetDetails;
 };
 
-export default useAssetType;
+export default useAssetTypeFromParams;

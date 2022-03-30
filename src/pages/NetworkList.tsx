@@ -7,6 +7,7 @@ import {
 import { ethers } from "ethers";
 import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
+import CreatePhononButton from "../components/CreatePhononButton";
 import NetworkListItem, {
   Props as NetworkListItemProps,
 } from "../components/NetworkListItem";
@@ -61,9 +62,12 @@ const NetworkList: React.FC = () => {
 
   return (
     <IonContent>
-      <div className="mt-2 text-center">
-        <p className="text-xs font-extrabold text-zinc-500">WALLET</p>
-        <p className="mb-3">{useSessionDisplayName(sessionId)}</p>
+      <div className="flex justify-between mt-2">
+        <div>
+          <p className="text-xs font-extrabold text-zinc-500">WALLET</p>
+          <p className="mb-3">{useSessionDisplayName(sessionId)}</p>
+        </div>
+        <CreatePhononButton />
       </div>
 
       <IonContent>

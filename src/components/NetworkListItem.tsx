@@ -9,7 +9,7 @@ import {
 import { ethers } from "ethers";
 import React from "react";
 import { useParams } from "react-router";
-import { ASSETS } from "../constants/assets";
+import { ASSET_TYPES } from "../constants/assets";
 import { NETWORK_DETAILS } from "../constants/networks";
 import useAssetDetails from "../hooks/useAssetDetails";
 import "../index.css";
@@ -29,7 +29,7 @@ const NetworkListItem: React.FC<Props> = ({
 }) => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const network = NETWORK_DETAILS[networkId];
-  const asset = ASSETS[assetTypeId];
+  const asset = ASSET_TYPES[assetTypeId];
 
   const assetDetails = useAssetDetails(networkId, assetTypeId, undefined);
 

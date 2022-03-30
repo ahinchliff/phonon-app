@@ -2,7 +2,7 @@ import { IonButton } from "@ionic/react";
 import clsx from "clsx";
 import React from "react";
 import { useForm, useWatch } from "react-hook-form";
-import useNetwork from "../hooks/useNetwork";
+import useNetworkFromParams from "../hooks/useNetworkFromParams";
 import { usePhonons } from "../hooks/usePhonons";
 import { weiToEth } from "../utils/denomination";
 import { reduceDenominations } from "../utils/math";
@@ -27,7 +27,7 @@ export const RedeemPhononFormCustom: React.FC<{
     name: "phononsToRedeem",
     control,
   });
-  const network = useNetwork();
+  const network = useNetworkFromParams();
   const { phonons } = usePhonons();
 
   const getTotal = () => {

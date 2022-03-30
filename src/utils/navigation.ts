@@ -11,11 +11,7 @@ export const getPhononListPath = (
   assetId: AssetIdParam
 ) => `/${sessionId}/${networkId}/${assetId}`;
 
-export const getCreatePath = (
-  sessionId: string,
-  networkId: NetworkIdParam,
-  assetId: AssetIdParam
-) => `/${sessionId}/${networkId}/${assetId}/create`;
+export const getCreatePath = (sessionId: string) => `/${sessionId}/create`;
 
 export const getRedeemPath = (
   sessionId: string,

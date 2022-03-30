@@ -39,13 +39,13 @@ const App: React.FC = () => {
             <Route exact path="/:sessionId" component={NetworkList} />
             <Route
               exact
-              path="/:sessionId/:networkId/:assetId"
-              component={PhononsList}
+              path="/:sessionId/create"
+              component={CreatePhononPage}
             />
             <Route
               exact
-              path="/:sessionId/:networkId/:assetId/create"
-              component={CreatePhononPage}
+              path="/:sessionId/:networkId/:assetId"
+              component={PhononsList}
             />
             <Route
               exact

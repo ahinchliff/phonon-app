@@ -19,24 +19,25 @@ import { getPhononListPath } from "../utils/navigation";
 export type Props = {
   networkId: NetworkId;
   assetTypeId: AssetTypeId;
-  value: ethers.BigNumber | undefined;
+  contractAddress?: string | undefined;
+  value: string | undefined;
 };
 
 const NetworkListItem: React.FC<Props> = ({
   networkId,
   assetTypeId,
+  contractAddress,
   value,
 }) => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const network = NETWORK_DETAILS[networkId];
-  const asset = ASSET_TYPES[assetTypeId];
-
-  const assetDetails = useAssetDetails(networkId, assetTypeId, undefined);
+  const assetDetails = useAssetDetails(networkId, assetTypeId, contractAddress);
 
   const displayValue =
-    value && assetTypeId === AssetTypeId.Native && assetDetails
-      ? ethers.utils.formatUnits(value, assetDetails.decimals)
-      : value && ethers.utils.formatUnits(value, "0");
+    value &&
+    (assetTypeId === AssetTypeId.ERC721
+      ? ethers.utils.formatUnits(value, "0")
+      : assetDetails && ethers.utils.formatUnits(value, assetDetails.decimals));
 
   return (
     <IonItem routerLink={getPhononListPath(sessionId, networkId, assetTypeId)}>
@@ -50,8 +51,8 @@ const NetworkListItem: React.FC<Props> = ({
       <IonLabel>
         <IonText color="light">
           <h1 className="text-xl">
-            {!displayValue ? <IonSpinner /> : displayValue} {network.ticker}{" "}
-            {asset.name}
+            {!displayValue ? <IonSpinner /> : displayValue}{" "}
+            {assetDetails?.symbol}
           </h1>
         </IonText>
       </IonLabel>

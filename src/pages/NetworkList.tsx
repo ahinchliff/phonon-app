@@ -3,57 +3,76 @@ import {
   IonList,
   IonRefresher,
   IonRefresherContent,
+  IonSpinner,
 } from "@ionic/react";
-import { ethers } from "ethers";
 import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import CreatePhononButton from "../components/CreatePhononButton";
 import NetworkListItem, {
   Props as NetworkListItemProps,
 } from "../components/NetworkListItem";
-import {
-  NETWORK_DETAILS,
-  SUPPORTED_ASSET_TYPES_BY_NETWORK,
-} from "../constants/networks";
+import { TAGS } from "../constants/tags";
 import useSessionDisplayName from "../hooks/useSessionDisplayName";
 import { useFetchPhononsQuery } from "../store/api";
 import { AssetTypeId } from "../types";
-
-const ASSET_TYPES = Object.values(NETWORK_DETAILS).flatMap((network) => {
-  const supportedAssets = SUPPORTED_ASSET_TYPES_BY_NETWORK[network.id];
-  return supportedAssets.map((assetTypeId) => ({
-    networkId: network.id,
-    assetTypeId,
-  }));
-});
+import { getTagValue } from "../utils/phonon/phonon-general";
 
 const NetworkList: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
-  const { data, refetch } = useFetchPhononsQuery({ sessionId });
+  const { data: phonons, refetch } = useFetchPhononsQuery({ sessionId });
 
-  // todo - display each token separately
-  // currently we group tokens by their network and assetType.
-  const asstTypesWithValue: Omit<NetworkListItemProps, "isLoading">[] =
-    useMemo(() => {
-      return ASSET_TYPES.map((at) => {
-        const value = data
-          ?.filter(
-            (phonon) =>
-              phonon.CurrencyType === at.networkId &&
-              phonon.ChainID === at.assetTypeId
-          )
-          .reduce((sum, next) => {
-            return sum.add(
-              at.assetTypeId === AssetTypeId.Native ? next.Denomination : "1"
-            );
-          }, ethers.constants.Zero);
+  const listItemData: NetworkListItemProps[] | undefined = useMemo(() => {
+    return phonons?.reduce((progress, phonon) => {
+      const contractAddress = getTagValue(phonon, TAGS.contractAddress);
 
-        return {
-          ...at,
-          value,
-        };
+      const indexOfExisting = progress.findIndex((item) => {
+        if (phonon.ChainID === AssetTypeId.ERC721) {
+          return item.assetTypeId === AssetTypeId.ERC721;
+        }
+
+        if (phonon.ChainID === AssetTypeId.ERC20) {
+          return (
+            item.assetTypeId === phonon.ChainID &&
+            item.networkId === phonon.CurrencyType &&
+            item.contractAddress === contractAddress
+          );
+        }
+
+        return (
+          item.assetTypeId === phonon.ChainID &&
+          item.networkId === phonon.AddressType
+        );
       });
-    }, [data]);
+
+      if (indexOfExisting === -1) {
+        return [
+          ...progress,
+          {
+            networkId: phonon.CurrencyType,
+            assetTypeId: phonon.ChainID,
+            contractAddress,
+            value:
+              phonon.ChainID === AssetTypeId.ERC721 ? "1" : phonon.Denomination,
+          },
+        ];
+      }
+
+      const exisitingItem = progress[indexOfExisting];
+      const existingValue = Number(exisitingItem.value);
+
+      const updatedItem = {
+        ...exisitingItem,
+        value:
+          phonon.ChainID === AssetTypeId.ERC721
+            ? (existingValue + 1).toString()
+            : (existingValue + Number(phonon.Denomination)).toString(),
+      };
+
+      progress.splice(indexOfExisting, 1, updatedItem);
+
+      return progress;
+    }, [] as NetworkListItemProps[]);
+  }, [phonons]);
 
   function refresh(event: CustomEvent<any>) {
     refetch();
@@ -78,10 +97,16 @@ const NetworkList: React.FC = () => {
         >
           <IonRefresherContent />
         </IonRefresher>
+        {listItemData?.length === 0 && <p>Empty wallet</p>}
+
         <IonList>
-          {asstTypesWithValue.map((x) => (
-            <NetworkListItem key={`${x.networkId} ${x.assetTypeId}`} {...x} />
-          ))}
+          {listItemData ? (
+            listItemData.map((x) => (
+              <NetworkListItem key={`${x.networkId} ${x.assetTypeId}`} {...x} />
+            ))
+          ) : (
+            <IonSpinner />
+          )}
         </IonList>
       </IonContent>
     </IonContent>
